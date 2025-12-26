@@ -9,8 +9,10 @@ COPY tsconfig.json ./
 # Install ALL dependencies (including dev dependencies for building)
 RUN npm ci && npm cache clean --force
 
+# Copy source code (cache bust: 2025-12-27-v2)
 COPY src ./src
 
+# Build TypeScript
 RUN npm run build
 
 # Production stage
