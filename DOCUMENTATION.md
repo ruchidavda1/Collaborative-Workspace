@@ -454,8 +454,8 @@ POSTGRES_DB=workspace_db
 MONGODB_URI=mongodb://localhost:27017/workspace
 
 # Redis
-REDIS_HOST=localhost
-REDIS_PORT=6379
+REDISHOST=localhost
+REDISPORT=6379
 REDIS_PASSWORD=
 
 # CORS

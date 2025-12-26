@@ -70,8 +70,8 @@ services:
       POSTGRES_PASSWORD: workspace_password
       POSTGRES_DB: collaborative_workspace
       MONGODB_URI: mongodb://mongodb:27017/collaborative_workspace
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
+      REDISHOST: redis
+      REDISPORT: 6379
       JWT_SECRET: your-super-secret-jwt-key-change-in-production
       JWT_REFRESH_SECRET: your-super-secret-refresh-key-change-in-production
     depends_on:
@@ -105,8 +105,8 @@ services:
       POSTGRES_PASSWORD: workspace_password
       POSTGRES_DB: collaborative_workspace
       MONGODB_URI: mongodb://mongodb:27017/collaborative_workspace
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
+      REDISHOST: redis
+      REDISPORT: 6379
       JWT_SECRET: your-super-secret-jwt-key-change-in-production
       JWT_REFRESH_SECRET: your-super-secret-refresh-key-change-in-production
     depends_on:

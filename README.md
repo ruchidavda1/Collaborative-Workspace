@@ -206,8 +206,8 @@ POSTGRES_DB=collaborative_workspace
 MONGODB_URI=mongodb://localhost:27017/collaborative_workspace
 
 # Redis
-REDIS_HOST=localhost
-REDIS_PORT=6379
+REDISHOST=localhost
+REDISPORT=6379
 
 # Rate Limiting
 RATE_LIMIT_WINDOW_MS=900000

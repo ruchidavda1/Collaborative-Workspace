@@ -95,8 +95,8 @@ jobs:
           POSTGRES_PASSWORD: test_password
           POSTGRES_DB: test_db
           MONGODB_URI: mongodb://localhost:27017/test_db
-          REDIS_HOST: localhost
-          REDIS_PORT: 6379
+          REDISHOST: localhost
+          REDISPORT: 6379
           JWT_SECRET: test-secret
           JWT_REFRESH_SECRET: test-refresh-secret
 
