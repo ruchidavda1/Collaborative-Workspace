@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collaborative Workspace - Live Demo</title>
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Ensure proper cursors for all interactive elements */
+        button,
+        select,
+        [role="button"],
+        [type="button"],
+        [type="submit"],
+        input[type="checkbox"],
+        input[type="radio"] {
+            cursor: pointer !important;
+        }
+
+        button:disabled {
+            cursor: not-allowed !important;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        textarea {
+            cursor: text !important;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px; /* Narrower for better vertical reading */
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+            text-shadow: 0 2px 4px rgba(102, 126, 234, 0.1);
+        }
+
+        h1::before {
+            content: "🚀 ";
+            -webkit-text-fill-color: initial;
+            background: none;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        .grid {
+            display: block; /* Changed from grid to block for vertical stacking */
+            margin-bottom: 20px;
+        }
+        
+        .grid .card {
+            margin-bottom: 20px; /* Add spacing between stacked cards */
+        }
+        
+        /* Force 2 columns for screens wider than 900px */
+        @media (min-width: 900px) {
+            .grid {
+                display: block; /* Keep vertical even on large screens */
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .card h2 {
+            color: #667eea;
+            font-size: 20px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .status.connected {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: 2px solid #059669;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+            padding: 8px 20px;
+            font-size: 13px;
+            font-weight: 700;
+            animation: pulse 2s infinite;
+        }
+
+        .status.connected::before {
+            content: " ";
+            margin-right: 4px;
+            font-weight: 900;
+        }
+
+        .status.disconnected {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: 2px solid #dc2626;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+            padding: 8px 20px;
+            font-size: 13px;
+            font-weight: 700;
+            animation: pulse-red 2s infinite;
+        }
+
+        .status.disconnected::before {
+            content: " ";
+            margin-right: 4px;
+            font-weight: 900;
+        }
+
+        @keyframes pulse-red {
+            0%, 100% {
+                box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+            }
+            50% {
+                box-shadow: 0 4px 20px rgba(239, 68, 68, 0.6);
+            }
+        }
+
+        .status.authenticated {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: 2px solid #059669;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+            padding: 8px 20px;
+            font-size: 13px;
+            font-weight: 700;
+            animation: pulse 2s infinite;
+        }
+
+        .status.authenticated::before {
+            content: "👤 ";
+            margin-right: 4px;
+        }
+
+        input, textarea, button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer !important;
+            background-color: white;
+            transition: border-color 0.2s;
+        }
+
+        select:hover {
+            border-color: #667eea;
+            cursor: pointer !important;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            cursor: text;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            cursor: text;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            cursor: pointer !important;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            cursor: pointer !important;
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(0px);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed !important;
+            transform: none;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 12px;
+            width: auto;
+            display: inline-block;
+            margin-right: 5px;
+            cursor: pointer !important;
+        }
+
+        .btn-small:hover {
+            cursor: pointer !important;
+        }
+
+        textarea {
+            min-height: 150px;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+        }
+
+        .log {
+            background: #1e293b;
+            color: #10b981;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-left: 3px solid #667eea;
+            padding-left: 10px;
+        }
+
+        .log-entry.success {
+            border-left-color: #10b981;
+        }
+
+        .log-entry.error {
+            border-left-color: #ef4444;
+            color: #ef4444;
+        }
+
+        .log-entry.info {
+            border-left-color: #3b82f6;
+            color: #3b82f6;
+        }
+
+        .user-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .user-badge {
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        /* Highlight for current user */
+        .user-badge.me {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: 2px solid #059669;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+            animation: pulse 2s infinite;
+            position: relative;
+        }
+
+        .user-badge.me::before {
+            content: "👤 YOU: ";
+            font-weight: 700;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+            }
+            50% {
+                box-shadow: 0 4px 20px rgba(16, 185, 129, 0.6);
+            }
+        }
+
+        .activity-item {
+            padding: 10px;
+            background: #f9fafb;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border-left: 3px solid #667eea;
+        }
+
+        .activity-time {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .info-box {
+            background: #eff6ff;
+            border: 2px solid #3b82f6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #1e40af;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Collaborative Workspace - Live Demo</h1>
+            <p class="subtitle">Real-time collaboration powered by WebSocket, Redis Pub/Sub & Bull Queue</p>
+            <div style="margin-top: 10px;">
+                <span id="connectionStatus" class="status disconnected">Disconnected</span>
+                <span id="authStatus" class="status disconnected" style="display: none;">Not Authenticated</span>
+            </div>
+        </header>
+
+        <!-- Authentication Section -->
+        <div id="authSection" class="card">
+            <h2>🔐 Step 1: Authentication</h2>
+            <div class="info-box">
+                👋 Welcome! First, create an account or login to access the collaborative features.
+            </div>
+            
+            <input type="email" id="email" placeholder="Email (e.g., demo@example.com)" value="demo@example.com">
+            <input type="password" id="password" placeholder="Password" value="password123">
+            <input type="text" id="firstName" placeholder="First Name (for registration)" value="Demo">
+            <input type="text" id="lastName" placeholder="Last Name (for registration)" value="User">
+            
+            <button onclick="register()">📝 Register New User</button>
+            <button onclick="login()">🔑 Login</button>
+        </div>
+
+        <!-- Main App Section (Hidden until authenticated) -->
+        <div id="appSection" class="hidden">
+            <div class="grid">
+                <!-- Create Project -->
+                <div class="card">
+                    <h2>📁 Step 2: Create a Project</h2>
+                    <input type="text" id="projectName" placeholder="Project Name" value="My Awesome Project">
+                    <textarea id="projectDesc" placeholder="Project Description">A collaborative coding project</textarea>
+                    <button onclick="createProject()">Create Project</button>
+                </div>
+
+                <!-- Create Workspace -->
+                <div class="card">
+                    <h2>🗂️ Step 3: Create Workspace</h2>
+                    <input type="text" id="workspaceName" placeholder="Workspace Name" value="Team Workspace">
+                    <input type="text" id="projectId" placeholder="Project ID (from Step 2)">
+                    <button onclick="createWorkspace()">Create Workspace</button>
+                </div>
+            </div>
+
+            <div class="grid">
+                <!-- Real-time Collaboration -->
+                <div class="card">
+                    <h2>⚡ Step 4: Real-Time Collaboration</h2>
+                    <input type="text" id="workspaceId" placeholder="Workspace ID (from Step 3)">
+                    <button onclick="joinWorkspace()" id="joinBtn">🚪 Join Workspace</button>
+                    <button onclick="leaveWorkspace()" id="leaveBtn" disabled>🚪 Leave Workspace</button>
+                    
+                    <div style="margin-top: 15px;">
+                        <h3 style="font-size: 14px; margin-bottom: 10px; color: #666;">👥 Active Users:</h3>
+                        <div class="user-list" id="userList">
+                            <div style="color: #9ca3af; font-size: 12px;">Join a workspace to see active users</div>
+                        </div>
+                    </div>
+
+                    <textarea id="codeEditor" placeholder="Type code here... Changes will be broadcast to all users in real-time!" style="margin-top: 15px;"></textarea>
+                </div>
+
+                <!-- Activities -->
+                <div class="card">
+                    <h2>📊 Real-Time Activities</h2>
+                    <div id="activities" class="log">
+                        <div class="log-entry info">Waiting for activities...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Background Jobs -->
+            <div class="card full-width">
+                <h2>⚙️ Step 5: Background Job Processing</h2>
+                <div class="info-box">
+                    Submit code for execution! It will be processed asynchronously by a worker.
+                </div>
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px;">
+                    <div>
+                        <textarea id="jobCode" placeholder="print('Hello from Python!')">print('Hello from Python!')
+for i in range(5):
+    print(f'Count: {i}')</textarea>
+                        <select id="jobLanguage" style="width: 100%; margin-bottom: 10px;">
+                            <option value="python">Python</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="java">Java</option>
+                        </select>
+                        <button onclick="submitJob()">🚀 Submit Job</button>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 14px; margin-bottom: 10px; color: #666;">Job Status:</h3>
+                        <div id="jobStatus" class="log" style="min-height: 200px;">
+                            <div class="log-entry">No jobs submitted yet</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Event Log -->
+            <div class="card full-width" style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); color: white; border: 2px solid #475569; margin-top: 30px;">
+                <h2 style="color: #60a5fa; border-bottom: 2px solid #475569; padding-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 24px;">📝</span>
+                    <span>System Event Log</span>
+                    <span style="font-size: 12px; background: #475569; padding: 4px 12px; border-radius: 12px; margin-left: auto; font-weight: 400;">Real-time Monitoring</span>
+                </h2>
+                <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; margin-top: 15px; border: 1px solid #475569;">
+                    <p style="margin: 0; font-size: 13px; color: #cbd5e1; opacity: 0.9;">
+                        📊 All system events and user actions are logged here in real-time
+                    </p>
+                </div>
+                <div id="eventLog" class="log" style="background: #0f172a; border: 1px solid #475569; margin-top: 15px;">
+                    <div class="log-entry success">System initialized</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api/v1';
+        const WS_URL = 'http://localhost:3000';
+        
+        let socket = null;
+        let accessToken = null;
+        let currentUser = null;
+        let currentWorkspace = null;
+        let activeUsers = new Set();
+
+        // Initialize Socket.io (not connected yet)
+        function initSocket() {
+            if (!accessToken) return;
+
+            socket = io(WS_URL, {
+                auth: { token: accessToken }
+            });
+
+            socket.on('connect', () => {
+                log('WebSocket connected!', 'success');
+                updateStatus('connectionStatus', 'Connected', 'connected');
+            });
+
+            socket.on('disconnect', () => {
+                log('WebSocket disconnected', 'error');
+                updateStatus('connectionStatus', 'Disconnected', 'disconnected');
+            });
+
+            socket.on('user_joined', (data) => {
+                log(`👤 ${data.payload.userName} joined the workspace`, 'info');
+                activeUsers.add(data.payload.userName);
+                updateUserList();
+                addActivity('User Joined', data.payload.userName);
+            });
+
+            socket.on('user_left', (data) => {
+                log(`👋 ${data.payload.userName} left the workspace`, 'info');
+                activeUsers.delete(data.payload.userName);
+                updateUserList();
+                addActivity('User Left', data.payload.userName);
+            });
+
+            socket.on('file_change', (data) => {
+                log(`📝 File changed by ${data.payload.userName}`, 'info');
+                addActivity('File Changed', `${data.payload.fileName} by ${data.payload.userName}`);
+            });
+
+            socket.on('cursor_move', (data) => {
+                // Don't log cursor movements (too frequent)
+            });
+
+            socket.on('error', (error) => {
+                log(`WebSocket error: ${error.message}`, 'error');
+            });
+        }
+
+        // API Calls
+        async function register() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+
+            try {
+                const response = await fetch(`${API_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, firstName, lastName })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    accessToken = data.data.accessToken;
+                    currentUser = data.data.user;
+                    log(`Registration successful! Welcome, ${currentUser.firstName}!`, 'success');
+                    onAuthenticated();
+                } else {
+                    log(`Registration failed: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    accessToken = data.data.accessToken;
+                    currentUser = data.data.user;
+                    log(`Login successful! Welcome back, ${currentUser.firstName}!`, 'success');
+                    onAuthenticated();
+                } else {
+                    log(`Login failed: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        function onAuthenticated() {
+            document.getElementById('authSection').classList.add('hidden');
+            document.getElementById('appSection').classList.remove('hidden');
+            document.getElementById('authStatus').style.display = 'inline-block';
+            updateStatus('authStatus', `YOU: ${currentUser.email}`, 'authenticated');
+            initSocket();
+        }
+
+        async function createProject() {
+            const name = document.getElementById('projectName').value;
+            const description = document.getElementById('projectDesc').value;
+
+            try {
+                const response = await fetch(`${API_URL}/projects`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    body: JSON.stringify({
+                        name,
+                        description,
+                        repository: 'https://github.com/demo/repo',
+                        language: 'JavaScript'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('projectId').value = data.data.id;
+                    log(`Project created! ID: ${data.data.id}`, 'success');
+                } else {
+                    log(`Failed to create project: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function createWorkspace() {
+            const name = document.getElementById('workspaceName').value;
+            const projectId = document.getElementById('projectId').value;
+
+            if (!projectId) {
+                log('Please create a project first!', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/workspaces`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    body: JSON.stringify({
+                        name,
+                        description: 'Demo workspace for real-time collaboration',
+                        projectId
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('workspaceId').value = data.data.id;
+                    log(`Workspace created! ID: ${data.data.id}`, 'success');
+                } else {
+                    log(`Failed to create workspace: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        function joinWorkspace() {
+            const workspaceId = document.getElementById('workspaceId').value;
+            
+            if (!workspaceId) {
+                log('Please enter a workspace ID!', 'error');
+                return;
+            }
+
+            if (!socket || !socket.connected) {
+                log('WebSocket not connected!', 'error');
+                return;
+            }
+
+            currentWorkspace = workspaceId;
+            socket.emit('join_workspace', workspaceId);
+            log(`🚪 Joining workspace: ${workspaceId}`, 'info');
+            
+            document.getElementById('joinBtn').disabled = true;
+            document.getElementById('leaveBtn').disabled = false;
+            
+            activeUsers.add(currentUser.email);
+            updateUserList();
+        }
+
+        function leaveWorkspace() {
+            if (!currentWorkspace) return;
+
+            socket.emit('leave_workspace', currentWorkspace);
+            log(`🚪 Left workspace: ${currentWorkspace}`, 'info');
+            
+            document.getElementById('joinBtn').disabled = false;
+            document.getElementById('leaveBtn').disabled = true;
+            
+            activeUsers.clear();
+            updateUserList();
+            currentWorkspace = null;
+        }
+
+        // File change on typing
+        document.addEventListener('DOMContentLoaded', () => {
+            const editor = document.getElementById('codeEditor');
+            let timeout = null;
+
+            editor.addEventListener('input', () => {
+                if (!socket || !currentWorkspace) return;
+
+                clearTimeout(timeout);
+                timeout = setTimeout(() => {
+                    socket.emit('file_change', {
+                        fileName: 'demo.js',
+                        changes: editor.value
+                    });
+                }, 500);
+            });
+        });
+
+        async function submitJob() {
+            const code = document.getElementById('jobCode').value;
+            const language = document.getElementById('jobLanguage').value;
+
+            try {
+                const response = await fetch(`${API_URL}/jobs`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    body: JSON.stringify({
+                        type: 'code_execution',
+                        data: { code, language }
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    const jobId = data.data.jobId;
+                    const userName = currentUser.email;
+                    log(`Job submitted by ${userName}! ID: ${jobId}`, 'success');
+                    updateJobStatus(`📤 Submitted by: ${userName}\n\nJob ID: ${jobId}\nStatus: Processing...`);
+                    pollJobStatus(jobId, userName);
+                } else {
+                    log(`Failed to submit job: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                log(` Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function pollJobStatus(jobId, userName) {
+            const maxAttempts = 20;
+            let attempts = 0;
+
+            const interval = setInterval(async () => {
+                attempts++;
+
+                try {
+                    const response = await fetch(`${API_URL}/jobs/${jobId}`, {
+                        headers: { 'Authorization': `Bearer ${accessToken}` }
+                    });
+
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        const job = data.data;
+                        updateJobStatus(`User: ${userName}\n📋 Job ID: ${jobId}\n📊 Status: ${job.status}\n⏳ Progress: ${job.progress}%`);
+
+                        if (job.status === 'completed') {
+                            clearInterval(interval);
+                            updateJobStatus(`Job Completed!\n\n👤 User: ${userName}\n📋 Job ID: ${jobId}\n\n📦 Result:\n${JSON.stringify(job.result, null, 2)}`);
+                            log(`Job completed successfully for ${userName}!`, 'success');
+                        } else if (job.status === 'failed') {
+                            clearInterval(interval);
+                            updateJobStatus(`Job Failed!\n\n👤 User: ${userName}\n📋 Job ID: ${jobId}\n\n❗ Error: ${job.error}`);
+                            log(`Job failed for ${userName}`, 'error');
+                        }
+                    }
+
+                    if (attempts >= maxAttempts) {
+                        clearInterval(interval);
+                        updateJobStatus(`Timeout\n\n User: ${userName}\n📋 Job ID: ${jobId}\n\nTimeout waiting for job completion`);
+                    }
+                } catch (error) {
+                    clearInterval(interval);
+                    log(`Error polling job: ${error.message}`, 'error');
+                }
+            }, 2000);
+        }
+
+        // Utility Functions
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('eventLog');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logDiv.appendChild(entry); // Add to bottom (chronological order)
+            
+            // Keep only last 50 entries (remove oldest from top)
+            while (logDiv.children.length > 50) {
+                logDiv.removeChild(logDiv.firstChild);
+            }
+        }
+
+        function updateStatus(elementId, text, className) {
+            const element = document.getElementById(elementId);
+            element.textContent = text;
+            element.className = `status ${className}`;
+        }
+
+        function updateUserList() {
+            const userList = document.getElementById('userList');
+            userList.innerHTML = '';
+            
+            if (activeUsers.size === 0) {
+                userList.innerHTML = '<div style="color: #9ca3af; font-size: 12px;">No active users</div>';
+                return;
+            }
+
+            activeUsers.forEach(user => {
+                const badge = document.createElement('div');
+                badge.className = 'user-badge';
+                
+                // Highlight current user
+                if (currentUser && user === currentUser.email) {
+                    badge.classList.add('me');
+                }
+                
+                badge.textContent = user;
+                userList.appendChild(badge);
+            });
+        }
+
+        function addActivity(type, description) {
+            const activitiesDiv = document.getElementById('activities');
+            const activity = document.createElement('div');
+            activity.className = 'log-entry success';
+            activity.innerHTML = `<strong>${type}</strong>: ${description}<br><span class="activity-time">${new Date().toLocaleTimeString()}</span>`;
+            activitiesDiv.appendChild(activity); // Add to bottom (chronological order)
+            
+            // Keep only last 20 entries (remove oldest from top)
+            while (activitiesDiv.children.length > 20) {
+                activitiesDiv.removeChild(activitiesDiv.firstChild);
+            }
+        }
+
+        function updateJobStatus(status) {
+            document.getElementById('jobStatus').innerHTML = `<div class="log-entry info">${status}</div>`;
+        }
+
+        // Initial log
+        log('Demo page loaded. Please authenticate to begin!', 'info');
+    </script>
+</body>
+</html>
+
