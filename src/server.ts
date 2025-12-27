@@ -17,7 +17,7 @@ const startServer = async () => {
     
     // Try to connect to MongoDB, but don't fail if it's not available
     try {
-      await connectMongoDB();
+    await connectMongoDB();
     } catch (mongoError) {
       logger.warn('MongoDB connection failed (non-critical):', mongoError);
       logger.info('Server will continue without MongoDB (jobs and activities disabled)');
