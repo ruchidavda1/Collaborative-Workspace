@@ -506,8 +506,14 @@ for i in range(5):
     </div>
 
     <script>
-        const API_URL = 'http://localhost:3000/api/v1';
-        const WS_URL = 'http://localhost:3000';
+        // Dynamically determine API and WebSocket URLs based on environment
+        const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+        const API_URL = isProduction 
+            ? `${window.location.protocol}//${window.location.host}/api/v1`
+            : 'http://localhost:3000/api/v1';
+        const WS_URL = isProduction 
+            ? `${window.location.protocol}//${window.location.host}`
+            : 'http://localhost:3000';
         
         let socket = null;
         let accessToken = null;

@@ -50,16 +50,6 @@ interface Config {
   };
 }
 
-// Debug: Log environment variables (remove in production)
-if (process.env.NODE_ENV !== 'test') {
-  console.log('[CONFIG DEBUG] Using DATABASE_URL:', process.env.DATABASE_URL ? 'YES' : 'NO');
-  console.log('[CONFIG DEBUG] POSTGRES_HOST:', process.env.POSTGRES_HOST);
-  console.log('[CONFIG DEBUG] POSTGRES_PORT:', process.env.POSTGRES_PORT);
-  console.log('[CONFIG DEBUG] POSTGRES_USER:', process.env.POSTGRES_USER);
-  console.log('[CONFIG DEBUG] POSTGRES_PASSWORD (ACTUAL):', process.env.POSTGRES_PASSWORD); // TEMPORARY - REMOVE AFTER DEBUGGING
-  console.log('[CONFIG DEBUG] POSTGRES_DB:', process.env.POSTGRES_DB);
-}
-
 const config: Config = {
   node_env: process.env.NODE_ENV || 'development',
   port: parseInt(process.env.PORT || '3000', 10),
@@ -90,7 +80,10 @@ const config: Config = {
     maxRequests: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100', 10),
   },
   cors: {
-    origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'],
+    origin: process.env.CORS_ORIGIN?.split(',') || [
+      'http://localhost:3000',
+      'https://collaborative-workspace-production.up.railway.app'
+    ],
   },
   logging: {
     level: process.env.LOG_LEVEL || 'info',

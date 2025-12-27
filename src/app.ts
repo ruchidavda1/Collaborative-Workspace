@@ -25,7 +25,14 @@ export const createApp = (): Application => {
         scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.socket.io"],
         scriptSrcAttr: ["'unsafe-inline'"], // Allow inline event handlers
         styleSrc: ["'self'", "'unsafe-inline'"],
-        connectSrc: ["'self'", "http://localhost:3000", "ws://localhost:3000", "https://cdn.socket.io"],
+        connectSrc: [
+          "'self'", 
+          "http://localhost:3000", 
+          "ws://localhost:3000", 
+          "https://cdn.socket.io",
+          "https://collaborative-workspace-production.up.railway.app",
+          "wss://collaborative-workspace-production.up.railway.app"
+        ],
         imgSrc: ["'self'", "data:", "https:"],
         fontSrc: ["'self'", "data:"],
       },
