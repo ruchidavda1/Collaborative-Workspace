@@ -22,7 +22,7 @@ A production-grade backend service for a real-time collaborative workspace platf
 <img src="./screenshots/swagger-userregister.png" alt="User Registration" width="300"/>
 
 ### Swagger - Authorization
-<img src="./screenshots/swaggerauthorizeui.png" alt="Swagger Authorization" width="300"/>
+<img src="./screenshots/swaggeruiauthorize.png" alt="Swagger Authorization" width="300"/>
 
 ### Real-Time Collaboration Logs
 <img src="./screenshots/RealTImeLogs.png" alt="Real-Time Logs" width="300"/>
