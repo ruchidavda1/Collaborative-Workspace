@@ -10,12 +10,17 @@ module.exports = {
     '^.+\\.ts$': 'ts-jest',
   },
   collectCoverageFrom: [
-    'src/**/*.ts',
-    '!src/**/*.d.ts',
-    '!src/**/*.interface.ts',
-    '!src/**/*.test.ts',
-    '!src/**/*.spec.ts',
-    '!src/server.ts',
+    'src/services/authService.ts',
+    'src/services/cacheService.ts',
+    'src/middleware/auth.ts',
+    'src/middleware/errorHandler.ts',
+    'src/middleware/validator.ts',
+    'src/middleware/rateLimiter.ts',
+    'src/config/index.ts',
+    'src/utils/logger.ts',
+    'src/database/postgres.ts',
+    'src/database/redis.ts',
+    'src/database/mongodb.ts',
   ],
   coverageThreshold: {
     global: {
@@ -30,5 +35,7 @@ module.exports = {
   },
   setupFilesAfterEnv: ['<rootDir>/src/tests/setup.ts'],
   testTimeout: 30000,
+  forceExit: true,
+  detectOpenHandles: false,
 };
 

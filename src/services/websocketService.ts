@@ -5,6 +5,7 @@ import { redisSubscriber, redisClient } from '../database/redis';
 import { Activity } from '../database/models/Activity';
 import { EventType, CollaborationEvent } from '../types';
 import logger from '../utils/logger';
+import { websocketConnections, websocketEvents, activeWorkspaces } from '../utils/metrics';
 import config from '../config';
 
 interface AuthenticatedSocket extends Socket {
@@ -56,6 +57,9 @@ export class WebSocketService {
   private setupEventHandlers() {
     this.io.on('connection', (socket: AuthenticatedSocket) => {
       logger.info(`Client connected: ${socket.id}, User: ${socket.userId}`);
+      
+      // Increment WebSocket connections metric
+      websocketConnections.inc();
 
       socket.on('join_workspace', async (workspaceId: string) => {
         try {
@@ -86,6 +90,10 @@ export class WebSocketService {
 
           // Publish to Redis for horizontal scaling
           await redisClient.publish('collaboration_events', JSON.stringify(event));
+
+          // Track metrics
+          websocketEvents.inc({ event_type: 'user_joined' });
+          this.updateActiveWorkspacesMetric();
 
           logger.info(`User ${socket.userId} joined workspace ${workspaceId}`);
         } catch (error) {
@@ -275,6 +283,17 @@ export class WebSocketService {
     } catch (error) {
       logger.error('Save activity error:', error);
     }
+  }
+
+  private updateActiveWorkspacesMetric() {
+    // Count unique workspaces with active users
+    const workspaces = new Set<string>();
+    this.io.sockets.sockets.forEach((socket: any) => {
+      if (socket.workspaceId) {
+        workspaces.add(socket.workspaceId);
+      }
+    });
+    activeWorkspaces.set(workspaces.size);
   }
 
   public getIO(): SocketIOServer {

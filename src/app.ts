@@ -8,6 +8,8 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import config from './config';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { generalLimiter } from './middleware/rateLimiter';
+import { metricsMiddleware } from './middleware/metrics';
+import { register } from './utils/metrics';
 import authRoutes from './routes/authRoutes';
 import projectRoutes from './routes/projectRoutes';
 import workspaceRoutes from './routes/workspaceRoutes';
@@ -51,6 +53,9 @@ export const createApp = (): Application => {
   // Body parsing
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+  // Metrics middleware (before routes)
+  app.use(metricsMiddleware);
 
   // Logging
   if (config.node_env === 'development') {
@@ -111,6 +116,16 @@ export const createApp = (): Application => {
       environment: config.node_env,
       version: config.api_version,
     });
+  });
+
+  // Metrics endpoint (Prometheus-compatible)
+  app.get('/metrics', async (_req, res) => {
+    try {
+      res.set('Content-Type', register.contentType);
+      res.end(await register.metrics());
+    } catch (error) {
+      res.status(500).end(error);
+    }
   });
 
   // Feature flags endpoint
