@@ -35,7 +35,7 @@
 <img src="./screenshots/Job processing-DemoandAlice.png" alt="Job Processing" width="300"/>
 
 ### Live Deployment on Railway
-<img src="./screenshots/railway-deployment.png" alt="Railway Deployment" width="300"/>
+<img src="./screenshots/realtimechat-filechange.png" alt="Railway Deployment" width="300"/>
 
 ---
 
