@@ -1386,8 +1386,13 @@ Railway automatically sets:
 
 **Add to Railway Environment Variables:**
 ```bash
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/workspace?retryWrites=true&w=majority
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/workspace?retryWrites=true&w=majority
 ```
+
+**Replace:**
+- `<username>` - Your MongoDB database username
+- `<password>` - Your database user password
+- `<cluster>` - Your cluster URL (e.g., cluster0.abc123)
 
 #### 3. Configure Environment Variables
 
