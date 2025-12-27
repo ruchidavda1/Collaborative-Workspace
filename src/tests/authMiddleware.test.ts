@@ -172,6 +172,130 @@ describe('Auth Middleware', () => {
       expect(mockResponse.status).toHaveBeenCalledWith(403);
       expect(nextFunction).not.toHaveBeenCalled();
     });
+
+    // RBAC Tests for Owner, Collaborator, Viewer
+    describe('Role-Based Access Control (RBAC)', () => {
+      it('should allow Owner to access owner-only resources', () => {
+        mockRequest.user = {
+          userId: '123',
+          email: 'owner@example.com',
+          role: 'owner',
+        };
+
+        const middleware = authorize(['owner']);
+        middleware(mockRequest as AuthRequest, mockResponse as Response, nextFunction);
+
+        expect(nextFunction).toHaveBeenCalled();
+        expect(mockResponse.status).not.toHaveBeenCalled();
+      });
+
+      it('should allow Owner to access collaborator resources', () => {
+        mockRequest.user = {
+          userId: '123',
+          email: 'owner@example.com',
+          role: 'owner',
+        };
+
+        const middleware = authorize(['owner', 'collaborator']);
+        middleware(mockRequest as AuthRequest, mockResponse as Response, nextFunction);
+
+        expect(nextFunction).toHaveBeenCalled();
+      });
+
+      it('should allow Collaborator to access collaborator resources', () => {
+        mockRequest.user = {
+          userId: '456',
+          email: 'collab@example.com',
+          role: 'collaborator',
+        };
+
+        const middleware = authorize(['owner', 'collaborator']);
+        middleware(mockRequest as AuthRequest, mockResponse as Response, nextFunction);
+
+        expect(nextFunction).toHaveBeenCalled();
+      });
+
+      it('should allow Viewer to access viewer resources', () => {
+        mockRequest.user = {
+          userId: '789',
+          email: 'viewer@example.com',
+          role: 'viewer',
+        };
+
+        const middleware = authorize(['owner', 'collaborator', 'viewer']);
+        middleware(mockRequest as AuthRequest, mockResponse as Response, nextFunction);
+
+        expect(nextFunction).toHaveBeenCalled();
+      });
+
+      it('should deny Viewer from accessing collaborator-only resources', () => {
+        mockRequest.user = {
+          userId: '789',
+          email: 'viewer@example.com',
+          role: 'viewer',
+        };
+
+        const middleware = authorize(['owner', 'collaborator']);
+        middleware(mockRequest as AuthRequest, mockResponse as Response, nextFunction);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(403);
+        expect(mockResponse.json).toHaveBeenCalledWith(
+          expect.objectContaining({
+            success: false,
+            message: 'Forbidden - Insufficient permissions',
+          })
+        );
+        expect(nextFunction).not.toHaveBeenCalled();
+      });
+
+      it('should deny Collaborator from accessing owner-only resources', () => {
+        mockRequest.user = {
+          userId: '456',
+          email: 'collab@example.com',
+          role: 'collaborator',
+        };
+
+        const middleware = authorize(['owner']);
+        middleware(mockRequest as AuthRequest, mockResponse as Response, nextFunction);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(403);
+        expect(nextFunction).not.toHaveBeenCalled();
+      });
+
+      it('should deny Viewer from accessing owner-only resources', () => {
+        mockRequest.user = {
+          userId: '789',
+          email: 'viewer@example.com',
+          role: 'viewer',
+        };
+
+        const middleware = authorize(['owner']);
+        middleware(mockRequest as AuthRequest, mockResponse as Response, nextFunction);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(403);
+        expect(nextFunction).not.toHaveBeenCalled();
+      });
+
+      it('should handle multiple allowed roles correctly', () => {
+        // Test that any of the allowed roles can access
+        const roles = ['owner', 'collaborator', 'viewer'];
+        
+        roles.forEach(role => {
+          jest.clearAllMocks();
+          mockRequest.user = {
+            userId: '123',
+            email: 'test@example.com',
+            role: role,
+          };
+
+          const middleware = authorize(roles);
+          middleware(mockRequest as AuthRequest, mockResponse as Response, nextFunction);
+
+          expect(nextFunction).toHaveBeenCalled();
+          expect(mockResponse.status).not.toHaveBeenCalled();
+        });
+      });
+    });
   });
 });
 

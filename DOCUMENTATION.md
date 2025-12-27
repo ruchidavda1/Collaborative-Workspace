@@ -105,7 +105,7 @@ A comprehensive **Real-Time Collaborative Workspace Backend** that enables multi
 **DevOps:**
 - Docker & Docker Compose
 - GitHub Actions CI/CD
-- Vercel/Railway deployment
+- Railway deployment
 
 ---
 
@@ -696,69 +696,126 @@ All files           |   73.45 |    65.23 |   71.89 |   74.12 |
 
 ## Deployment
 
-### Option 1: Vercel (Recommended for Demo)
+### Why Railway? 
 
-#### Setup Cloud Databases
+This project is deployed on **Railway** instead of Vercel for critical architectural reasons:
 
-**PostgreSQL - ElephantSQL:**
-1. https://www.elephantsql.com/
-2. Create free instance (20MB)
-3. Copy connection URL
+#### **Railway Advantages:**
+1. **Full Backend Support** - Runs Node.js processes (not serverless)
+2. **WebSocket Support** - Real-time Socket.io connections stay alive
+3. **Background Workers** - Supports separate worker processes for Bull queue
+4. **Built-in Databases** - PostgreSQL, MongoDB, Redis included
+5. **No Timeouts** - Long-running processes work perfectly
+6. **Docker Support** - Full containerization with Dockerfile
+7. **Environment Variables** - Easy configuration management
+8. **Auto-scaling** - Handles traffic spikes
 
-**MongoDB - Atlas:**
-1. https://www.mongodb.com/cloud/atlas
-2. Create free cluster (512MB)
-3. Whitelist IP: `0.0.0.0/0`
-4. Copy connection string
+####  **Why NOT Vercel:**
+1. **Serverless Only** - Can't run persistent WebSocket servers
+2. **Timeout Limits** - 10s (hobby) / 60s (pro) max execution time
+3. **Cold Starts** - Kills real-time performance
+4. **No Workers** - Can't run background job processors
+5. **No Built-in Databases** - Requires external services
+6. **Not Designed for This** - Built for Next.js/static sites
 
-**Redis - Upstash:**
-1. https://upstash.com/
-2. Create free database
-3. Copy host, port, password
+### Railway Deployment (Recommended)
 
-#### Deploy to Vercel
-
-```bash
-# Install Vercel CLI
-npm install -g vercel
-
-# Login
-vercel login
-
-# Deploy
-vercel
-
-# Set environment variables in dashboard
-# Then deploy to production
-vercel --prod
-```
-
-#### Environment Variables (Vercel Dashboard)
-
-Add all variables from `.env.example` with production values.
-
-### Option 2: Railway (Supports Workers)
+#### 1. Setup Railway Project
 
 ```bash
 # Install Railway CLI
 npm install -g @railway/cli
 
-# Login
+# Login to Railway
 railway login
 
-# Initialize
+# Initialize project
 railway init
 
-# Add databases
-railway add postgresql
-railway add mongodb
-railway add redis
-
-# Deploy
-railway up
+# Link to existing project (if already created on web)
+railway link
 ```
 
-### Option 3: Docker Compose
+#### 2. Add Database Services
+
+**Via Railway Dashboard:**
+1. Go to https://railway.app/
+2. Click your project
+3. Click "New" → "Database"
+4. Add:
+   - PostgreSQL
+   - MongoDB  
+   - Redis
+
+**Via CLI:**
+```bash
+railway add postgresql
+railway add mongodb  
+railway add redis
+```
+
+Railway automatically sets environment variables:
+- `DATABASE_URL` - PostgreSQL connection string
+- `MONGODB_URI` - MongoDB connection string
+- `REDIS_URL` - Redis connection string
+
+#### 3. Configure Environment Variables
+
+In Railway Dashboard → Variables, add:
+
+```bash
+NODE_ENV=production
+PORT=3000
+API_VERSION=v1
+
+# JWT (generate secure keys)
+JWT_SECRET=your_super_secret_key_min_32_chars_here
+JWT_REFRESH_SECRET=another_super_secret_key_min_32_chars
+JWT_ACCESS_EXPIRY=15m
+JWT_REFRESH_EXPIRY=7d
+
+# CORS (use your Railway domain)
+CORS_ORIGIN=https://collaborative-workspace-production.up.railway.app
+
+# Rate Limiting
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+
+# Feature Flags
+ENABLE_ADVANCED_ANALYTICS=true
+ENABLE_CODE_EXECUTION=true
+
+# Job Queue
+JOB_QUEUE_CONCURRENCY=5
+JOB_QUEUE_MAX_RETRIES=3
+```
+
+**Note:** Database URLs are auto-populated by Railway services!
+
+#### 4. Deploy
+
+```bash
+# Deploy from CLI
+railway up
+
+# Or connect GitHub and auto-deploy
+# Settings → Connect GitHub → Enable auto-deploy on push
+```
+
+#### 5. Verify Deployment
+
+```bash
+# Check logs
+railway logs
+
+# Open application
+railway open
+
+# Get deployment URL
+railway status
+```
+
+### Alternative: Docker Compose (Self-Hosted)
 
 ```bash
 # Production build
@@ -774,9 +831,11 @@ GitHub Actions automatically:
 1. Lints code
 2. Runs tests
 3. Builds TypeScript
-4. Deploys to Vercel (on main branch)
+4. Deploys to Railway (on main branch push)
 
 **Workflow:** `.github/workflows/ci-cd.yml`
+
+**Note:** Configure Railway GitHub integration to enable auto-deployments.
 
 ---
 
@@ -798,12 +857,19 @@ git branch -M main
 git push -u origin main
 ```
 
-#### 2. Deploy to Vercel
+#### 2. Deploy to Railway
 
-1. Sign up at https://vercel.com
-2. Import GitHub repository
-3. Add environment variables
-4. Deploy
+1. Sign up at https://railway.app
+2. Create new project
+3. Add databases (PostgreSQL, MongoDB, Redis)
+4. Connect GitHub repository
+5. Add environment variables
+6. Deploy
+
+**Your Deployment:**
+- **Live App:** https://collaborative-workspace-production.up.railway.app/
+- **Demo Page:** https://collaborative-workspace-production.up.railway.app/demo.html
+- **API Docs:** https://collaborative-workspace-production.up.railway.app/api-docs
 
 #### 3. Create Submission Document
 
@@ -824,9 +890,15 @@ Use the template in `ASSESSMENT_SUBMISSION.md`:
 
 **Include:**
 - GitHub repository URL
-- Live deployment URL
+- Live Railway deployment URL
 - Demo page URL
 - API docs URL
+
+**Example:**
+- GitHub: https://github.com/yourusername/collaborative-workspace
+- Live App: https://collaborative-workspace-production.up.railway.app/
+- Demo: https://collaborative-workspace-production.up.railway.app/demo.html
+- API Docs: https://collaborative-workspace-production.up.railway.app/api-docs
 
 **Deadline:** 28th December 2025, 10:30 AM IST
 
@@ -875,8 +947,9 @@ Follow conventional commits:
 - GitHub Issues: [Repository URL]/issues
 
 ### Documentation
-- API Docs: http://localhost:3000/api-docs
-- Demo: http://localhost:3000/demo.html
+- API Docs: https://collaborative-workspace-production.up.railway.app/api-docs
+- Demo: https://collaborative-workspace-production.up.railway.app/demo.html
+- GitHub: [Repository URL]
 
 ### Resources
 - Node.js: https://nodejs.org/
