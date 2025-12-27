@@ -11,7 +11,7 @@ const databaseConfig = process.env.DATABASE_URL
   ? {
       type: 'postgres' as const,
       url: process.env.DATABASE_URL,
-      synchronize: config.node_env === 'development',
+      synchronize: true, // Auto-create tables (OK for demo/development, use migrations in real production)
       logging: config.node_env === 'development',
       entities: [User, Project, Workspace, WorkspaceCollaborator],
       migrations: ['src/database/migrations/*.ts'],

@@ -17,6 +17,9 @@ import logger from './utils/logger';
 export const createApp = (): Application => {
   const app = express();
 
+  // Trust proxy - Required for Railway and other reverse proxy setups
+  app.set('trust proxy', true);
+
   // Security middleware (with CSP adjustments for demo page)
   app.use(helmet({
     contentSecurityPolicy: {
