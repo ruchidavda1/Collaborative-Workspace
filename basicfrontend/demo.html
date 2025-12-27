@@ -383,9 +383,167 @@
                 padding: 15px;
             }
         }
+
+        /* Toast Notification Styles */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+        }
+
+        .toast {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideInRight 0.3s ease-out;
+            border-left: 4px solid;
+            min-width: 300px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .toast.success {
+            border-left-color: #10b981;
+        }
+
+        .toast.error {
+            border-left-color: #ef4444;
+        }
+
+        .toast.info {
+            border-left-color: #3b82f6;
+        }
+
+        .toast.warning {
+            border-left-color: #f59e0b;
+        }
+
+        .toast-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+            color: #1f2937;
+        }
+
+        .toast-message {
+            font-size: 13px;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .toast-close:hover {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .toast-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: currentColor;
+            opacity: 0.3;
+            animation: shrink 3s linear forwards;
+        }
+
+        .toast.success .toast-progress {
+            color: #10b981;
+        }
+
+        .toast.error .toast-progress {
+            color: #ef4444;
+        }
+
+        .toast.info .toast-progress {
+            color: #3b82f6;
+        }
+
+        .toast.warning .toast-progress {
+            color: #f59e0b;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        @keyframes shrink {
+            from {
+                width: 100%;
+            }
+            to {
+                width: 0%;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .toast-container {
+                left: 20px;
+                right: 20px;
+                max-width: none;
+            }
+
+            .toast {
+                min-width: unset;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
     <div class="container">
         <header>
             <h1>Collaborative Workspace - Live Demo</h1>
@@ -531,11 +689,13 @@ for i in range(5):
 
             socket.on('connect', () => {
                 log('✅ WebSocket connected!', 'success');
+                showToast('Connected!', 'Real-time features are now active', 'success', 2000);
                 updateStatus('connectionStatus', 'Connected', 'connected');
             });
 
             socket.on('disconnect', () => {
                 log('❌ WebSocket disconnected', 'error');
+                showToast('Disconnected', 'Real-time connection lost. Attempting to reconnect...', 'warning', 4000);
                 updateStatus('connectionStatus', 'Disconnected', 'disconnected');
             });
 
@@ -587,12 +747,15 @@ for i in range(5):
                     accessToken = data.data.accessToken;
                     currentUser = data.data.user;
                     log(`✅ Registration successful! Welcome, ${currentUser.firstName}!`, 'success');
+                    showToast('Registration Successful!', `Welcome, ${currentUser.firstName}! Your account has been created.`, 'success');
                     onAuthenticated();
                 } else {
                     log(`❌ Registration failed: ${data.message}`, 'error');
+                    showToast('Registration Failed', data.message, 'error');
                 }
             } catch (error) {
                 log(`⚠️ Error: ${error.message}`, 'error');
+                showToast('Error', 'Unable to connect to server', 'error');
             }
         }
 
@@ -613,12 +776,15 @@ for i in range(5):
                     accessToken = data.data.accessToken;
                     currentUser = data.data.user;
                     log(`✅ Login successful! Welcome back, ${currentUser.firstName}!`, 'success');
+                    showToast('Login Successful!', `Welcome back, ${currentUser.firstName}!`, 'success');
                     onAuthenticated();
                 } else {
                     log(`❌ Login failed: ${data.message}`, 'error');
+                    showToast('Login Failed', data.message, 'error');
                 }
             } catch (error) {
                 log(`⚠️ Error: ${error.message}`, 'error');
+                showToast('Error', 'Unable to connect to server', 'error');
             }
         }
 
@@ -654,11 +820,14 @@ for i in range(5):
                 if (data.success) {
                     document.getElementById('projectId').value = data.data.id;
                     log(`✅ Project created! ID: ${data.data.id}`, 'success');
+                    showToast('Project Created!', `${name} has been created successfully`, 'success');
                 } else {
                     log(`❌ Failed to create project: ${data.message}`, 'error');
+                    showToast('Failed to Create Project', data.message, 'error');
                 }
             } catch (error) {
                 log(`⚠️ Error: ${error.message}`, 'error');
+                showToast('Error', 'Unable to create project', 'error');
             }
         }
 
@@ -668,6 +837,7 @@ for i in range(5):
 
             if (!projectId) {
                 log('⚠️ Please create a project first!', 'error');
+                showToast('Project Required', 'Please create a project before creating a workspace', 'warning');
                 return;
             }
 
@@ -690,11 +860,14 @@ for i in range(5):
                 if (data.success) {
                     document.getElementById('workspaceId').value = data.data.id;
                     log(`✅ Workspace created! ID: ${data.data.id}`, 'success');
+                    showToast('Workspace Created!', `${name} is ready for collaboration`, 'success');
                 } else {
                     log(`❌ Failed to create workspace: ${data.message}`, 'error');
+                    showToast('Failed to Create Workspace', data.message, 'error');
                 }
             } catch (error) {
                 log(`⚠️ Error: ${error.message}`, 'error');
+                showToast('Error', 'Unable to create workspace', 'error');
             }
         }
 
@@ -703,17 +876,20 @@ for i in range(5):
             
             if (!workspaceId) {
                 log('⚠️ Please enter a workspace ID!', 'error');
+                showToast('Workspace ID Required', 'Please enter a workspace ID to join', 'warning');
                 return;
             }
 
             if (!socket || !socket.connected) {
                 log('⚠️ WebSocket not connected!', 'error');
+                showToast('Connection Error', 'WebSocket is not connected. Please refresh the page.', 'error');
                 return;
             }
 
             currentWorkspace = workspaceId;
             socket.emit('join_workspace', workspaceId);
             log(`🚪 Joining workspace: ${workspaceId}`, 'info');
+            showToast('Joined Workspace', 'You are now collaborating in real-time!', 'success');
             
             document.getElementById('joinBtn').disabled = true;
             document.getElementById('leaveBtn').disabled = false;
@@ -727,6 +903,7 @@ for i in range(5):
 
             socket.emit('leave_workspace', currentWorkspace);
             log(`🚪 Left workspace: ${currentWorkspace}`, 'info');
+            showToast('Left Workspace', 'You have left the collaborative workspace', 'info');
             
             document.getElementById('joinBtn').disabled = false;
             document.getElementById('leaveBtn').disabled = true;
@@ -777,13 +954,16 @@ for i in range(5):
                     const jobId = data.data.jobId;
                     const userName = currentUser.email;
                     log(`✅ Job submitted by ${userName}! ID: ${jobId}`, 'success');
+                    showToast('Job Submitted!', 'Your code is being processed by the worker', 'success');
                     updateJobStatus(`📤 Submitted by: ${userName}\n\nJob ID: ${jobId}\nStatus: Processing...`);
                     pollJobStatus(jobId, userName);
                 } else {
                     log(`❌ Failed to submit job: ${data.message}`, 'error');
+                    showToast('Job Submission Failed', data.message, 'error');
                 }
             } catch (error) {
                 log(`⚠️ Error: ${error.message}`, 'error');
+                showToast('Error', 'Unable to submit job', 'error');
             }
         }
 
@@ -809,10 +989,12 @@ for i in range(5):
                             clearInterval(interval);
                             updateJobStatus(`Job Completed!\n\n👤 User: ${userName}\n📋 Job ID: ${jobId}\n\n📦 Result:\n${JSON.stringify(job.result, null, 2)}`);
                             log(`✅ Job completed successfully for ${userName}!`, 'success');
+                            showToast('Job Completed!', 'Your code executed successfully', 'success');
                         } else if (job.status === 'failed') {
                             clearInterval(interval);
                             updateJobStatus(`Job Failed!\n\n👤 User: ${userName}\n📋 Job ID: ${jobId}\n\n❗ Error: ${job.error}`);
                             log(`❌ Job failed for ${userName}`, 'error');
+                            showToast('Job Failed', 'Code execution encountered an error', 'error');
                         }
                     }
 
@@ -828,6 +1010,37 @@ for i in range(5):
         }
 
         // Utility Functions
+        function showToast(title, message, type = 'info', duration = 3000) {
+            const container = document.getElementById('toastContainer');
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <div class="toast-icon">${icons[type]}</div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+                <div class="toast-progress"></div>
+            `;
+
+            container.appendChild(toast);
+
+            // Auto remove after duration
+            setTimeout(() => {
+                toast.style.animation = 'slideOutRight 0.3s ease-out';
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
         function log(message, type = 'info') {
             const logDiv = document.getElementById('eventLog');
             const entry = document.createElement('div');
