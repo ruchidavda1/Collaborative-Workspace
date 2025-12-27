@@ -50,6 +50,15 @@ interface Config {
   };
 }
 
+// Debug: Log environment variables (remove in production)
+if (process.env.NODE_ENV !== 'test') {
+  console.log('[CONFIG DEBUG] POSTGRES_HOST:', process.env.POSTGRES_HOST);
+  console.log('[CONFIG DEBUG] POSTGRES_PORT:', process.env.POSTGRES_PORT);
+  console.log('[CONFIG DEBUG] POSTGRES_USER:', process.env.POSTGRES_USER);
+  console.log('[CONFIG DEBUG] POSTGRES_PASSWORD:', process.env.POSTGRES_PASSWORD ? '***SET***' : 'NOT SET');
+  console.log('[CONFIG DEBUG] POSTGRES_DB:', process.env.POSTGRES_DB);
+}
+
 const config: Config = {
   node_env: process.env.NODE_ENV || 'development',
   port: parseInt(process.env.PORT || '3000', 10),
