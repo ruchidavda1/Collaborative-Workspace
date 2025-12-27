@@ -534,6 +534,94 @@ npm run worker
 
 ### 2. Docker Setup
 
+#### Docker Files Overview
+
+This project includes 4 Docker-related files, each serving a specific purpose:
+
+**1. `Dockerfile` - Main API Server Container**
+```
+Purpose: Builds the production container for the Express API server
+Used By: Railway deployment, production servers
+Contains: API endpoints, WebSocket server, static frontend files
+Entry Point: node dist/server.js
+Port: 3000
+
+When to use:
+Deploying to Railway/AWS/DigitalOcean
+Running production API server
+CI/CD pipelines
+```
+
+**2. `Dockerfile.worker` - Background Job Processor**
+```
+Purpose: Separate container for Bull queue worker process
+Used By: Docker Compose, multi-container deployments
+Contains: Job processing logic (code execution, file processing)
+Entry Point: node src/workers/jobWorker.ts
+No Port: Worker doesn't expose HTTP endpoints
+
+When to use:
+Self-hosted deployments with Docker Compose
+Scaling workers independently from API
+NOT needed for Railway (uses main Dockerfile for both)
+```
+
+**3. `docker-compose.yml` - Complete Local Environment**
+```
+Purpose: Orchestrates all services (API, Worker, PostgreSQL, MongoDB, Redis)
+Used By: Local development, self-hosted deployments
+Contains: 5 services configuration, network setup, volume management
+Manages: postgres, mongodb, redis, api, worker
+
+When to use:
+Quick local setup (no Homebrew needed)
+Team development (consistent environment)
+Self-hosting on VPS/dedicated server
+Testing full stack locally
+NOT used by Railway (managed platform)
+```
+
+**4. `.dockerignore` - Build Optimization**
+```
+Purpose: Excludes unnecessary files from Docker build context
+Used By: All Dockerfile builds
+Excludes: node_modules, .git, logs, tests, .env
+Result: Faster builds, smaller images, better security
+
+When to use:
+Always present (improves all Docker builds)
+Prevents sensitive files from entering containers
+```
+
+---
+
+#### Deployment vs Local Development
+
+**For Railway Deployment (Current):**
+```
+Uses: Dockerfile only
+Ignores: Dockerfile.worker, docker-compose.yml
+Why: Railway manages services natively, runs worker from same image
+```
+
+**For Self-Hosted Deployment:**
+```
+Uses: All 3 files (Dockerfile, Dockerfile.worker, docker-compose.yml)
+Why: Complete multi-container setup with separate scaling
+Command: docker-compose up -d
+```
+
+**For Local Development (Without Docker):**
+```
+Uses: None
+Why: Use Homebrew for databases, npm for running code
+Command: npm run dev (terminal 1) + npm run worker (terminal 2)
+```
+
+---
+
+#### Docker Commands
+
 ```bash
 # Start all services
 docker-compose up -d

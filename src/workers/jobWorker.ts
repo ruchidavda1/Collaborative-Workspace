@@ -28,12 +28,13 @@ const processJob = async (jobData: any, progress: (value: number) => void) => {
   progress(25);
 
   switch (type) {
-    case 'code_execution':
+    case 'code_execution': {
       const result = await executeCode(data.code, data.language);
       progress(75);
       return result;
+    }
 
-    case 'file_processing':
+    case 'file_processing': {
       await new Promise((resolve) => setTimeout(resolve, 1500));
       progress(75);
       return {
@@ -41,8 +42,9 @@ const processJob = async (jobData: any, progress: (value: number) => void) => {
         files: data.files,
         processedCount: data.files?.length || 0,
       };
+    }
 
-    case 'workspace_export':
+    case 'workspace_export': {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       progress(75);
       return {
@@ -50,6 +52,7 @@ const processJob = async (jobData: any, progress: (value: number) => void) => {
         workspaceId: data.workspaceId,
         exportUrl: `https://exports.example.com/${data.workspaceId}.zip`,
       };
+    }
 
     default:
       throw new Error(`Unknown job type: ${type}`);
