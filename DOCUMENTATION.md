@@ -1474,17 +1474,5 @@ GitHub Actions automatically:
 
 ---
 
-
-#### 2. Deploy to Railway
-
-1. Sign up at https://railway.app
-2. Create new project
-3. Add databases (PostgreSQL, MongoDB, Redis)
-4. Connect GitHub repository
-5. Add environment variables
-6. Deploy
-
-**Your Deployment:**
-- **Live App:** https://collaborative-workspace-production.up.railway.app/
-- **Demo Page:** https://collaborative-workspace-production.up.railway.app/demo.html
-- **API Docs:** https://collaborative-workspace-production.up.railway.app/api-docs
+*Last Updated: December 2025*  
+*Version: 1.0.0*
