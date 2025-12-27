@@ -64,6 +64,36 @@ A production-grade backend service for a real-time collaborative workspace platf
 
 ---
 
+### GitHub Actions - Railway Deployment
+
+<table>
+<tr>
+<td width="50%">
+
+### GitHub Actions CI/CD Pipeline
+<img src="./screenshots/githubaction-railway.png" alt="GitHub Actions" width="100%"/>
+
+</td>
+<td width="50%">
+
+### Railway Deployment - Dashboard
+<img src="./screenshots/railway deployment1.png" alt="Railway Deployment 1" width="100%"/>
+
+</td>
+</tr>
+
+<tr>
+<td colspan="2">
+
+### Railway Deployment - Logs & Status
+<img src="./screenshots/railway deployment2.png" alt="Railway Deployment 2" width="50%"/>
+
+</td>
+</tr>
+</table>
+
+---
+
 ### Swagger API Documentation
 
 <table>
