@@ -27,8 +27,8 @@ A production-grade backend service for a real-time collaborative workspace platf
 ### Job Submitted
 <img src="./screenshots/Jobsubmitted-AliceandDemo.png" alt="Job Submitted" width="300"/>
 
-### Live Deployment on Railway
-<img src="./screenshots/realtimechat-filechange.png" alt="Railway Deployment" width="300"/>
+### Realtimechat-filechange
+<img src="./screenshots/realtimechat-filechange.png" alt="realtimechat-filechange" width="300"/>
 
 ---
 
