@@ -87,10 +87,16 @@
 </tr>
 
 <tr>
-<td colspan="2">
+<td width="50%">
 
-### Realtimechat-filechange
-<img src="./screenshots/realtimechat-filechange.png" alt="realtimechat-filechange" width="50%"/>
+### System Event Job Logs
+<img src="./screenshots/systemeventjob logs.png" alt="System Event Job Logs" width="100%"/>
+
+</td>
+<td width="50%">
+
+### Real-Time Chat & File Change
+<img src="./screenshots/realtimechat-filechange.png" alt="Real-Time Chat File Change" width="100%"/>
 
 </td>
 </tr>

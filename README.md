@@ -40,6 +40,21 @@ A production-grade backend service for a real-time collaborative workspace platf
 <tr>
 <td width="50%">
 
+### Real-Time Collaboration Feature
+<img src="./screenshots/realtime-collaboration.png" alt="Real-Time Collaboration" width="100%"/>
+
+</td>
+<td width="50%">
+
+### Project Creation
+<img src="./screenshots/Project-create.png" alt="Project Create" width="100%"/>
+
+</td>
+</tr>
+
+<tr>
+<td width="50%">
+
 ### Job Processing
 <img src="./screenshots/Job processing-DemoandAlice.png" alt="Job Processing" width="100%"/>
 
@@ -68,10 +83,16 @@ A production-grade backend service for a real-time collaborative workspace platf
 </tr>
 
 <tr>
-<td colspan="2">
+<td width="50%">
 
-### Realtimechat-filechange
-<img src="./screenshots/realtimechat-filechange.png" alt="realtimechat-filechange" width="50%"/>
+### System Event Job Logs
+<img src="./screenshots/systemeventjob logs.png" alt="System Event Job Logs" width="100%"/>
+
+</td>
+<td width="50%">
+
+### Real-Time Chat & File Change
+<img src="./screenshots/realtimechat-filechange.png" alt="Real-Time Chat File Change" width="100%"/>
 
 </td>
 </tr>
@@ -115,14 +136,29 @@ A production-grade backend service for a real-time collaborative workspace platf
 <tr>
 <td width="50%">
 
-### Swagger UI - Complete Interface
-<img src="./screenshots/swaggerui1.png" alt="Swagger UI" width="100%"/>
+### Swagger UI - Main Interface
+<img src="./screenshots/swaggerui1.png" alt="Swagger UI Main" width="100%"/>
 
 </td>
 <td width="50%">
 
+### Swagger UI - API Endpoints
+<img src="./screenshots/swaggerui2.png" alt="Swagger UI Endpoints" width="100%"/>
+
+</td>
+</tr>
+
+<tr>
+<td width="50%">
+
 ### Swagger - User Registration
-<img src="./screenshots/swagger-userregister.png" alt="User Registration" width="100%"/>
+<img src="./screenshots/swagger-userregister.png" alt="Swagger User Register" width="100%"/>
+
+</td>
+<td width="50%">
+
+### Swagger - Registration Response
+<img src="./screenshots/swagger-userregister1response.png" alt="Swagger Register Response" width="100%"/>
 
 </td>
 </tr>
@@ -130,8 +166,8 @@ A production-grade backend service for a real-time collaborative workspace platf
 <tr>
 <td colspan="2">
 
-### Swagger - Authorization
-<img src="./screenshots/swaggeruiauthorize.png" alt="Swagger Authorization" width="50%"/>
+### Swagger - Authorization UI
+<img src="./screenshots/swaggeruiauthorize.png" alt="Swagger Authorize" width="50%"/>
 
 </td>
 </tr>
