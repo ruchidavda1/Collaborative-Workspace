@@ -52,6 +52,7 @@ interface Config {
 
 // Debug: Log environment variables (remove in production)
 if (process.env.NODE_ENV !== 'test') {
+  console.log('[CONFIG DEBUG] Using DATABASE_URL:', process.env.DATABASE_URL ? 'YES' : 'NO');
   console.log('[CONFIG DEBUG] POSTGRES_HOST:', process.env.POSTGRES_HOST);
   console.log('[CONFIG DEBUG] POSTGRES_PORT:', process.env.POSTGRES_PORT);
   console.log('[CONFIG DEBUG] POSTGRES_USER:', process.env.POSTGRES_USER);
