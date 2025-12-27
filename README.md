@@ -5,6 +5,47 @@
 
 A production-grade backend service for a real-time collaborative workspace platform, similar to collaborative coding environments. Built with scalability, security, and performance in mind.
 
+## 📸 Screenshots
+
+<div align="center">
+
+### Demo Page Interface
+<img src="./screenshots/demo-page.png" alt="Demo Page" width="300"/>
+
+### Login Success & WebSocket Connection
+<img src="./screenshots/loginsuccess-websocketconnect.png" alt="Login Success" width="300"/>
+
+### Swagger UI - Complete Interface
+<img src="./screenshots/swaggerui1.png" alt="Swagger UI" width="300"/>
+
+### Swagger - User Registration
+<img src="./screenshots/swagger-userregister.png" alt="User Registration" width="300"/>
+
+### Swagger - Authorization
+<img src="./screenshots/swaggerauthorizeui.png" alt="Swagger Authorization" width="300"/>
+
+### Real-Time Collaboration Logs
+<img src="./screenshots/RealTImeLogs.png" alt="Real-Time Logs" width="300"/>
+
+### User Joined Workspace
+<img src="./screenshots/Joined Workspace.png" alt="User Joined" width="300"/>
+
+### Job Processing
+<img src="./screenshots/Job processing-DemoandAlice.png" alt="Job Processing" width="300"/>
+
+### Job Submitted
+<img src="./screenshots/Jobsubmitted-AliceandDemo.png" alt="Job Submitted" width="300"/>
+
+### Live Deployment on Railway
+<img src="./screenshots/railway-deployment.png" alt="Railway Deployment" width="300"/>
+
+### Console Logs with Emojis
+<img src="./screenshots/RealTImeLogs.png" alt="Console Logs" width="300"/>
+
+</div>
+
+---
+
 ## Table of Contents
 
 - [Features](#features)
@@ -265,6 +306,11 @@ Once the server is running, access the interactive Swagger documentation at:
 ```
 http://localhost:3000/api-docs
 ```
+
+<div align="center">
+<img src="./screenshots/loginsuccess-websocketconnect.png" alt="Swagger Authentication Flow" width="300"/>
+<p><em>Interactive API testing with Swagger UI</em></p>
+</div>
 
 ### API Endpoints Overview
 

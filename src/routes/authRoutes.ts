@@ -1,10 +1,17 @@
-import { Router } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { body } from 'express-validator';
 import { AuthController } from '../controllers/authController';
 import { validate } from '../middleware/validator';
 import { authLimiter } from '../middleware/rateLimiter';
 
 const router = Router();
+
+// Async handler wrapper to catch errors
+const asyncHandler = (fn: (req: Request, res: Response, next: NextFunction) => Promise<void>) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+  };
+};
 
 /**
  * @swagger
@@ -48,7 +55,7 @@ router.post(
     body('firstName').notEmpty().trim(),
     body('lastName').notEmpty().trim(),
   ]),
-  AuthController.register
+  asyncHandler(AuthController.register)
 );
 
 /**
@@ -82,7 +89,7 @@ router.post(
   '/login',
   authLimiter,
   validate([body('email').isEmail().normalizeEmail(), body('password').notEmpty()]),
-  AuthController.login
+  asyncHandler(AuthController.login)
 );
 
 /**
@@ -107,7 +114,7 @@ router.post(
  *       200:
  *         description: Token refreshed successfully
  */
-router.post('/refresh', validate([body('refreshToken').notEmpty()]), AuthController.refreshToken);
+router.post('/refresh', validate([body('refreshToken').notEmpty()]), asyncHandler(AuthController.refreshToken));
 
 /**
  * @swagger
@@ -122,7 +129,7 @@ router.post('/refresh', validate([body('refreshToken').notEmpty()]), AuthControl
  *       200:
  *         description: Logout successful
  */
-router.post('/logout', AuthController.logout);
+router.post('/logout', asyncHandler(AuthController.logout));
 
 export default router;
 

@@ -14,7 +14,14 @@ const startServer = async () => {
     // Initialize databases
     logger.info('Initializing databases...');
     await initializeDatabase();
-    await connectMongoDB();
+    
+    // Try to connect to MongoDB, but don't fail if it's not available
+    try {
+      await connectMongoDB();
+    } catch (mongoError) {
+      logger.warn('MongoDB connection failed (non-critical):', mongoError);
+      logger.info('Server will continue without MongoDB (jobs and activities disabled)');
+    }
 
     // Create Express app
     const app = createApp();

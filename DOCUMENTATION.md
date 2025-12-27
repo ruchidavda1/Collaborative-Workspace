@@ -6,17 +6,68 @@
 
 ---
 
+## Screenshots
+
+<div align="center">
+
+### Demo Page Interface
+<img src="./screenshots/demo-page.png" alt="Demo Page" width="300"/>
+
+### Login Success & WebSocket Connection
+<img src="./screenshots/loginsuccess-websocketconnect.png" alt="Login Success" width="300"/>
+
+### Swagger UI - Main Interface
+<img src="./screenshots/swaggerui1.png" alt="Swagger UI Main" width="300"/>
+
+### Swagger UI - API Endpoints
+<img src="./screenshots/swaggerui2.png" alt="Swagger UI Endpoints" width="300"/>
+
+### Swagger - User Registration
+<img src="./screenshots/swagger-userregister.png" alt="Swagger User Register" width="300"/>
+
+### Swagger - Registration Response
+<img src="./screenshots/swagger-userregister1response.png" alt="Swagger Register Response" width="300"/>
+
+### Swagger - Authorization UI
+<img src="./screenshots/swaggeruiauthorize.png" alt="Swagger Authorize" width="300"/>
+
+### Real-Time Collaboration Logs
+<img src="./screenshots/RealTImeLogs.png" alt="Real-Time Logs" width="300"/>
+
+### User Joined Workspace
+<img src="./screenshots/Joined Workspace.png" alt="User Joined" width="300"/>
+
+### Project Creation
+<img src="./screenshots/Project-create.png" alt="Project Create" width="300"/>
+
+### Job Submitted - Multiple Users
+<img src="./screenshots/Jobsubmitted-AliceandDemo.png" alt="Job Submitted" width="300"/>
+
+### Job Processing - Demo and Alice
+<img src="./screenshots/Job processing-DemoandAlice.png" alt="Job Processing" width="300"/>
+
+### Real-Time Collaboration Feature
+<img src="./screenshots/realtime-collaboration.png" alt="Real-Time Collaboration" width="300"/>
+
+### Live Deployment on Railway
+<img src="./screenshots/railway-deployment.png" alt="Railway Deployment" width="300"/>
+
+</div>
+
+---
+
 ## Table of Contents
 
-1. [Quick Start](#quick-start)
-2. [Project Overview](#project-overview)
-3. [Features](#features)
-4. [Architecture](#architecture)
-5. [Setup & Installation](#setup--installation)
-6. [API Documentation](#api-documentation)
-7. [Testing](#testing)
-8. [Deployment](#deployment)
-9. [Contributing](#contributing)
+1. [Screenshots](#-screenshots)
+2. [Quick Start](#quick-start)
+3. [Project Overview](#project-overview)
+4. [Features](#features)
+5. [Architecture](#architecture)
+6. [Setup & Installation](#setup--installation)
+7. [API Documentation](#api-documentation)
+8. [Testing](#testing)
+9. [Deployment](#deployment)
+10. [Contributing](#contributing)
 
 ---
 
