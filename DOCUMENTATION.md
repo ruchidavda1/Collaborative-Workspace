@@ -16,6 +16,31 @@
 ### Login Success & WebSocket Connection
 <img src="./screenshots/loginsuccess-websocketconnect.png" alt="Login Success" width="300"/>
 
+### Real-Time Collaboration Logs
+<img src="./screenshots/RealTImeLogs.png" alt="Real-Time Logs" width="300"/>
+
+### User Joined Workspace
+<img src="./screenshots/Joined Workspace.png" alt="User Joined" width="300"/>
+
+### Real-Time Collaboration Feature
+<img src="./screenshots/realtime-collaboration.png" alt="Real-Time Collaboration" width="300"/>
+
+### Project Creation
+<img src="./screenshots/Project-create.png" alt="Project Create" width="300"/>
+
+### Job Submitted - Multiple Users
+<img src="./screenshots/Jobsubmitted-AliceandDemo.png" alt="Job Submitted" width="300"/>
+
+### Job Processing - Demo and Alice
+<img src="./screenshots/Job processing-DemoandAlice.png" alt="Job Processing" width="300"/>
+
+### Live Deployment on Railway
+<img src="./screenshots/railway-deployment.png" alt="Railway Deployment" width="300"/>
+
+---
+
+### Swagger API Documentation
+
 ### Swagger UI - Main Interface
 <img src="./screenshots/swaggerui1.png" alt="Swagger UI Main" width="300"/>
 
@@ -30,27 +55,6 @@
 
 ### Swagger - Authorization UI
 <img src="./screenshots/swaggeruiauthorize.png" alt="Swagger Authorize" width="300"/>
-
-### Real-Time Collaboration Logs
-<img src="./screenshots/RealTImeLogs.png" alt="Real-Time Logs" width="300"/>
-
-### User Joined Workspace
-<img src="./screenshots/Joined Workspace.png" alt="User Joined" width="300"/>
-
-### Project Creation
-<img src="./screenshots/Project-create.png" alt="Project Create" width="300"/>
-
-### Job Submitted - Multiple Users
-<img src="./screenshots/Jobsubmitted-AliceandDemo.png" alt="Job Submitted" width="300"/>
-
-### Job Processing - Demo and Alice
-<img src="./screenshots/Job processing-DemoandAlice.png" alt="Job Processing" width="300"/>
-
-### Real-Time Collaboration Feature
-<img src="./screenshots/realtime-collaboration.png" alt="Real-Time Collaboration" width="300"/>
-
-### Live Deployment on Railway
-<img src="./screenshots/railway-deployment.png" alt="Railway Deployment" width="300"/>
 
 </div>
 

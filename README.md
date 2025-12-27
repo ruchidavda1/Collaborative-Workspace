@@ -15,15 +15,6 @@ A production-grade backend service for a real-time collaborative workspace platf
 ### Login Success & WebSocket Connection
 <img src="./screenshots/loginsuccess-websocketconnect.png" alt="Login Success" width="300"/>
 
-### Swagger UI - Complete Interface
-<img src="./screenshots/swaggerui1.png" alt="Swagger UI" width="300"/>
-
-### Swagger - User Registration
-<img src="./screenshots/swagger-userregister.png" alt="User Registration" width="300"/>
-
-### Swagger - Authorization
-<img src="./screenshots/swaggeruiauthorize.png" alt="Swagger Authorization" width="300"/>
-
 ### Real-Time Collaboration Logs
 <img src="./screenshots/RealTImeLogs.png" alt="Real-Time Logs" width="300"/>
 
@@ -39,8 +30,18 @@ A production-grade backend service for a real-time collaborative workspace platf
 ### Live Deployment on Railway
 <img src="./screenshots/railway-deployment.png" alt="Railway Deployment" width="300"/>
 
-### Console Logs with Emojis
-<img src="./screenshots/RealTImeLogs.png" alt="Console Logs" width="300"/>
+---
+
+### Swagger API Documentation
+
+### Swagger UI - Complete Interface
+<img src="./screenshots/swaggerui1.png" alt="Swagger UI" width="300"/>
+
+### Swagger - User Registration
+<img src="./screenshots/swagger-userregister.png" alt="User Registration" width="300"/>
+
+### Swagger - Authorization
+<img src="./screenshots/swaggeruiauthorize.png" alt="Swagger Authorization" width="300"/>
 
 </div>
 
