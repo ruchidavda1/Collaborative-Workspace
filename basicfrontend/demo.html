@@ -530,12 +530,12 @@ for i in range(5):
             });
 
             socket.on('connect', () => {
-                log('WebSocket connected!', 'success');
+                log('✅ WebSocket connected!', 'success');
                 updateStatus('connectionStatus', 'Connected', 'connected');
             });
 
             socket.on('disconnect', () => {
-                log('WebSocket disconnected', 'error');
+                log('❌ WebSocket disconnected', 'error');
                 updateStatus('connectionStatus', 'Disconnected', 'disconnected');
             });
 
@@ -563,7 +563,7 @@ for i in range(5):
             });
 
             socket.on('error', (error) => {
-                log(`WebSocket error: ${error.message}`, 'error');
+                log(`⚠️ WebSocket error: ${error.message}`, 'error');
             });
         }
 
@@ -586,13 +586,13 @@ for i in range(5):
                 if (data.success) {
                     accessToken = data.data.accessToken;
                     currentUser = data.data.user;
-                    log(`Registration successful! Welcome, ${currentUser.firstName}!`, 'success');
+                    log(`✅ Registration successful! Welcome, ${currentUser.firstName}!`, 'success');
                     onAuthenticated();
                 } else {
-                    log(`Registration failed: ${data.message}`, 'error');
+                    log(`❌ Registration failed: ${data.message}`, 'error');
                 }
             } catch (error) {
-                log(`Error: ${error.message}`, 'error');
+                log(`⚠️ Error: ${error.message}`, 'error');
             }
         }
 
@@ -612,13 +612,13 @@ for i in range(5):
                 if (data.success) {
                     accessToken = data.data.accessToken;
                     currentUser = data.data.user;
-                    log(`Login successful! Welcome back, ${currentUser.firstName}!`, 'success');
+                    log(`✅ Login successful! Welcome back, ${currentUser.firstName}!`, 'success');
                     onAuthenticated();
                 } else {
-                    log(`Login failed: ${data.message}`, 'error');
+                    log(`❌ Login failed: ${data.message}`, 'error');
                 }
             } catch (error) {
-                log(`Error: ${error.message}`, 'error');
+                log(`⚠️ Error: ${error.message}`, 'error');
             }
         }
 
@@ -653,12 +653,12 @@ for i in range(5):
                 
                 if (data.success) {
                     document.getElementById('projectId').value = data.data.id;
-                    log(`Project created! ID: ${data.data.id}`, 'success');
+                    log(`✅ Project created! ID: ${data.data.id}`, 'success');
                 } else {
-                    log(`Failed to create project: ${data.message}`, 'error');
+                    log(`❌ Failed to create project: ${data.message}`, 'error');
                 }
             } catch (error) {
-                log(`Error: ${error.message}`, 'error');
+                log(`⚠️ Error: ${error.message}`, 'error');
             }
         }
 
@@ -667,7 +667,7 @@ for i in range(5):
             const projectId = document.getElementById('projectId').value;
 
             if (!projectId) {
-                log('Please create a project first!', 'error');
+                log('⚠️ Please create a project first!', 'error');
                 return;
             }
 
@@ -689,12 +689,12 @@ for i in range(5):
                 
                 if (data.success) {
                     document.getElementById('workspaceId').value = data.data.id;
-                    log(`Workspace created! ID: ${data.data.id}`, 'success');
+                    log(`✅ Workspace created! ID: ${data.data.id}`, 'success');
                 } else {
-                    log(`Failed to create workspace: ${data.message}`, 'error');
+                    log(`❌ Failed to create workspace: ${data.message}`, 'error');
                 }
             } catch (error) {
-                log(`Error: ${error.message}`, 'error');
+                log(`⚠️ Error: ${error.message}`, 'error');
             }
         }
 
@@ -702,12 +702,12 @@ for i in range(5):
             const workspaceId = document.getElementById('workspaceId').value;
             
             if (!workspaceId) {
-                log('Please enter a workspace ID!', 'error');
+                log('⚠️ Please enter a workspace ID!', 'error');
                 return;
             }
 
             if (!socket || !socket.connected) {
-                log('WebSocket not connected!', 'error');
+                log('⚠️ WebSocket not connected!', 'error');
                 return;
             }
 
@@ -776,14 +776,14 @@ for i in range(5):
                 if (data.success) {
                     const jobId = data.data.jobId;
                     const userName = currentUser.email;
-                    log(`Job submitted by ${userName}! ID: ${jobId}`, 'success');
+                    log(`✅ Job submitted by ${userName}! ID: ${jobId}`, 'success');
                     updateJobStatus(`📤 Submitted by: ${userName}\n\nJob ID: ${jobId}\nStatus: Processing...`);
                     pollJobStatus(jobId, userName);
                 } else {
-                    log(`Failed to submit job: ${data.message}`, 'error');
+                    log(`❌ Failed to submit job: ${data.message}`, 'error');
                 }
             } catch (error) {
-                log(` Error: ${error.message}`, 'error');
+                log(`⚠️ Error: ${error.message}`, 'error');
             }
         }
 
@@ -808,11 +808,11 @@ for i in range(5):
                         if (job.status === 'completed') {
                             clearInterval(interval);
                             updateJobStatus(`Job Completed!\n\n👤 User: ${userName}\n📋 Job ID: ${jobId}\n\n📦 Result:\n${JSON.stringify(job.result, null, 2)}`);
-                            log(`Job completed successfully for ${userName}!`, 'success');
+                            log(`✅ Job completed successfully for ${userName}!`, 'success');
                         } else if (job.status === 'failed') {
                             clearInterval(interval);
                             updateJobStatus(`Job Failed!\n\n👤 User: ${userName}\n📋 Job ID: ${jobId}\n\n❗ Error: ${job.error}`);
-                            log(`Job failed for ${userName}`, 'error');
+                            log(`❌ Job failed for ${userName}`, 'error');
                         }
                     }
 
@@ -822,7 +822,7 @@ for i in range(5):
                     }
                 } catch (error) {
                     clearInterval(interval);
-                    log(`Error polling job: ${error.message}`, 'error');
+                    log(`⚠️ Error polling job: ${error.message}`, 'error');
                 }
             }, 2000);
         }
@@ -888,7 +888,7 @@ for i in range(5):
         }
 
         // Initial log
-        log('Demo page loaded. Please authenticate to begin!', 'info');
+        log('🚀 Demo page loaded. Please authenticate to begin!', 'info');
     </script>
 </body>
 </html>
