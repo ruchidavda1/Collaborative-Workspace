@@ -1,11 +1,8 @@
 # Real-Time Collaborative Workspace Backend
 
-[![CI/CD Pipeline](https://github.com/yourusername/collaborative-workspace/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/yourusername/collaborative-workspace/actions)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
 A production-grade backend service for a real-time collaborative workspace platform, similar to collaborative coding environments. Built with scalability, security, and performance in mind.
 
-## 📸 Screenshots
+## Screenshots
 
 <div align="center">
 
