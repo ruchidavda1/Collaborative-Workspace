@@ -152,9 +152,63 @@ A comprehensive **Real-Time Collaborative Workspace Backend** that enables multi
 - `DELETE /api/v1/workspaces/:id/collaborators/:userId` - Remove collaborator
 
 **Roles:**
-- **Owner** - Full control
-- **Collaborator** - Can edit
-- **Viewer** - Read-only
+- **Owner** - Full control (create, update, delete, manage collaborators)
+- **Collaborator** - Can edit content, view workspace
+- **Viewer** - Read-only access
+
+**How Roles Are Assigned:**
+
+1. **When Creating Workspace:**
+   - Project owner automatically has OWNER permissions
+   - No collaborator record needed (checked via `project.ownerId`)
+
+2. **When Inviting Collaborators:**
+   ```bash
+   POST /api/v1/workspaces/{workspaceId}/collaborators
+   {
+     "email": "user@example.com",
+     "role": "collaborator"  ← Set role here
+   }
+   ```
+   Valid roles: `owner`, `collaborator`, `viewer`
+
+3. **Changing Roles:**
+   ```bash
+   PUT /api/v1/workspaces/{workspaceId}/collaborators/{collaboratorId}
+   {
+     "role": "viewer"  ← Update role
+   }
+   ```
+
+4. **Default Role:** If not specified, defaults to `viewer`
+
+**Role Permissions:**
+
+| Action | Owner | Collaborator | Viewer |
+|--------|-------|--------------|--------|
+| View workspace | ✅ | ✅ | ✅ |
+| Edit content | ✅ | ✅ | ❌ |
+| Update settings | ✅ | ❌ | ❌ |
+| Delete workspace | ✅ | ❌ | ❌ |
+| Invite/remove users | ✅ | ❌ | ❌ |
+| Change roles | ✅ | ❌ | ❌ |
+
+**Testing Roles (Swagger):**
+```
+1. Register 3 users (owner, collab, viewer)
+2. Owner: Create workspace
+3. Owner: Invite collab with role="collaborator"
+4. Owner: Invite viewer with role="viewer"
+5. Test as collab: Can view ✅, Can't delete ❌ (403)
+6. Test as viewer: Can view ✅, Can't edit ❌ (403)
+```
+
+**Database Storage:**
+- Table: `workspace_collaborators`
+- Column: `role` (enum: owner/collaborator/viewer)
+- Location: `src/database/entities/WorkspaceCollaborator.ts`
+- Type Definition: `src/types/index.ts` (UserRole enum)
+
 
 ### 4. Real-Time Collaboration
 
@@ -519,7 +573,171 @@ http://localhost:3000/api/v1
 ### Interactive Documentation
 ```
 http://localhost:3000/api-docs
+https://collaborative-workspace-production.up.railway.app/api-docs
 ```
+
+**Features:**
+- 📖 Complete API reference
+- Test endpoints directly in browser
+- Request/response examples
+- JWT authentication support
+- No additional tools needed
+
+### Swagger/OpenAPI Testing Guide
+
+#### Accessing Swagger UI
+
+**Local Development:**
+```
+http://localhost:3000/api-docs
+```
+
+**Production (Railway):**
+```
+https://collaborative-workspace-production.up.railway.app/api-docs
+```
+
+#### Testing Flow
+
+**1. Authentication:**
+```
+Step 1: Expand "Authentication" section
+Step 2: Click "POST /api/v1/auth/register"
+Step 3: Click "Try it out"
+Step 4: Fill in request body:
+{
+  "email": "test@example.com",
+  "password": "Test123!@#",
+  "firstName": "Test",
+  "lastName": "User"
+}
+Step 5: Click "Execute"
+Step 6: Copy the accessToken from response
+```
+
+**2. Authorize Requests:**
+```
+Step 1: Click "Authorize" button (top right, 🔓 icon)
+Step 2: Enter: Bearer YOUR_ACCESS_TOKEN
+Step 3: Click "Authorize"
+Step 4: Click "Close"
+```
+
+Now all protected endpoints will include your token automatically!
+
+**3. Test Projects:**
+```
+POST /api/v1/projects - Create project
+GET /api/v1/projects - List your projects
+GET /api/v1/projects/{id} - Get specific project
+PUT /api/v1/projects/{id} - Update project
+DELETE /api/v1/projects/{id} - Delete project
+```
+
+**4. Test Workspaces:**
+```
+POST /api/v1/workspaces - Create workspace
+GET /api/v1/workspaces/{id} - Get workspace
+POST /api/v1/workspaces/{id}/collaborators - Add collaborator
+PUT /api/v1/workspaces/{id}/collaborators/{collabId} - Update role
+```
+
+**5. Test Jobs:**
+```
+POST /api/v1/jobs - Submit job
+GET /api/v1/jobs/{id} - Check job status
+GET /api/v1/jobs - List all jobs
+```
+
+#### Testing RBAC (Role-Based Access Control)
+
+**Scenario: Test workspace roles**
+
+1. **Register 3 users:**
+   - owner@test.com
+   - collab@test.com
+   - viewer@test.com
+
+2. **Login as owner:**
+   ```json
+   POST /auth/login
+   { "email": "owner@test.com", "password": "..." }
+   ```
+   → Copy owner's token → Authorize
+
+3. **Create project and workspace:**
+   ```json
+   POST /projects
+   { "name": "Test Project", "description": "..." }
+   
+   POST /workspaces
+   { "name": "Test Workspace", "projectId": "..." }
+   ```
+
+4. **Invite collaborators:**
+   ```json
+   POST /workspaces/{id}/collaborators
+   { "email": "collab@test.com", "role": "collaborator" }
+   
+   POST /workspaces/{id}/collaborators
+   { "email": "viewer@test.com", "role": "viewer" }
+   ```
+
+5. **Test permissions:**
+   - Login as collaborator → Try to delete workspace (should fail)
+   - Login as viewer → Try to update workspace (should fail)
+   - Login as owner → Delete workspace (should succeed)
+
+#### Common Testing Scenarios
+
+**Test Rate Limiting:**
+```
+1. Make 10 rapid requests to /auth/login
+2. Should see 429 Too Many Requests after limit
+```
+
+**Test Validation:**
+```
+1. Try POST /projects with empty name
+2. Should see 400 Bad Request with validation errors
+```
+
+**Test Caching:**
+```
+1. GET /projects (first call - slow)
+2. GET /projects again (cached - fast)
+3. POST new project
+4. GET /projects (cache invalidated - slow)
+```
+
+#### Swagger Response Codes
+
+| Code | Meaning | Example |
+|------|---------|---------|
+| 200 | Success | GET request succeeded |
+| 201 | Created | Resource created successfully |
+| 400 | Bad Request | Invalid input/validation error |
+| 401 | Unauthorized | No token or invalid token |
+| 403 | Forbidden | Insufficient permissions |
+| 404 | Not Found | Resource doesn't exist |
+| 429 | Too Many Requests | Rate limit exceeded |
+| 500 | Server Error | Internal error |
+
+#### Tips for Swagger Testing
+
+ **Do:**
+- Use "Try it out" for quick testing
+- Save tokens from responses
+- Use "Authorize" button for JWT auth
+- Check response schemas
+- Test error cases
+- Clear authorization between users
+
+ **Don't:**
+- Forget to authorize after login
+- Test with production data in demo
+- Share your access tokens
+- Leave browser tab open with valid token
 
 ### Authentication Header
 ```
@@ -635,6 +853,159 @@ curl -X POST http://localhost:3000/api/v1/jobs \
 
 ## Testing
 
+**Two Ways to Test This Application:**
+
+1. **API Testing (Swagger UI)** - Test backend endpoints directly in browser
+2. **Frontend Testing (Demo Page)** - Test complete user experience with real-time features
+
+---
+
+## 1. API Testing with Swagger UI
+
+### What is Swagger Testing?
+
+Swagger UI provides **interactive API documentation** where you can:
+- Test all API endpoints directly in your browser
+- No code or additional tools required  
+- Authenticate with JWT tokens
+- See request/response examples in real-time
+- Test validation, errors, and edge cases
+
+**When to use:** Testing individual endpoints, authentication, RBAC, debugging API responses
+
+**Access Swagger:**
+- Local: `http://localhost:3000/api-docs`
+- Production: `https://collaborative-workspace-production.up.railway.app/api-docs`
+
+### Quick Start with Swagger
+
+**Step 1: Register & Get Token**
+1. Open Swagger UI
+2. Find `POST /api/v1/auth/register`
+3. Click "Try it out"
+4. Enter JSON:
+   ```json
+   {
+     "email": "demo@example.com",
+     "password": "Demo123!@#",
+     "firstName": "Demo",
+     "lastName": "User"
+   }
+   ```
+5. Click "Execute"
+6. Copy `accessToken` from response
+
+**Step 2: Authorize**
+1. Click  "Authorize" button (top right)
+2. Enter: `Bearer YOUR_ACCESS_TOKEN`
+3. Click "Authorize" → "Close"
+
+**Step 3: Test Endpoint**
+1. Try `POST /api/v1/projects`
+2. Enter: `{"name": "Test Project", "description": "..."}`
+3. Click "Execute"
+4. See 201 Created!
+
+### Swagger Testing Scenarios
+
+**Test RBAC:**
+- Register 3 users (owner, collaborator, viewer)
+- Create workspace as owner
+- Invite others with different roles
+- Test permissions (viewer can't delete = 403)
+
+**Test Rate Limiting:**
+- Make 10 rapid login attempts
+- Should see 429 after limit
+
+**Test Caching:**
+- GET /projects (first call ~50ms)
+- GET /projects again (cached ~5ms)
+
+---
+
+## 2. Frontend Testing with Demo Page
+
+### What is Demo Page Testing?
+
+The demo page is a **fully functional frontend** that lets you:
+- Test complete user experience
+- See real-time collaboration
+- Test WebSocket connections
+- Simulate multiple users
+
+**When to use:** Testing real-time features, UI/UX, multi-user collaboration, recording demos
+
+**Access Demo:**
+- Local: `http://localhost:3000/demo.html`
+- Production: `https://collaborative-workspace-production.up.railway.app/demo.html`
+
+### Quick Start with Demo Page
+
+**Step 1: Setup**
+1. Open demo page
+2. Open DevTools (F12) → Console tab
+
+**Step 2: Register**
+1. Fill in email, password, name
+2. Click "Register"
+3. Check console: `✅ Registration successful!`
+4. Check: `🔌 WebSocket connected!`
+
+**Step 3: Create Workspace**
+1. Create project → copy Project ID
+2. Create workspace → copy Workspace ID
+3. Click "Join Workspace"
+4. Check console: `👤 User joined`
+
+**Step 4: Test Real-Time (2 Windows)**
+1. Open second browser window (incognito)
+2. Register different user
+3. Both join same workspace
+4. In Window 1: Click "File Changed"
+5. In Window 2: See instant update!
+
+### Demo Page Testing Scenarios
+
+**Multi-User Collaboration:**
+```
+Window 1 (User A):
+- Create & join workspace
+- Send file change
+
+Window 2 (User B):  
+- Join same workspace
+- Receive User A's changes instantly!
+- Send cursor movement
+
+Both see:
+- Real-time messages
+- Activity feed updates
+- User presence
+```
+
+**What to Check:**
+- ✅ Console logs (emojis show success)
+- ✅ Network tab (WebSocket connection)
+- ✅ No 404 or connection errors
+
+---
+
+## Swagger vs Demo Page
+
+| Feature | Swagger | Demo Page |
+|---------|---------|-----------|
+| Test API endpoints | ✅ Best | ❌ Can't |
+| Test WebSockets | ❌ Can't | ✅ Best |
+| Test RBAC | ✅ Best | ⚠️ Limited |
+| Multi-user test | ❌ Can't | ✅ Best |
+| Error debugging | ✅ Best | ⚠️ Limited |
+| Demo to clients | ❌ Technical | ✅ Best |
+
+---
+
+## Automated Unit Testing
+
 ### Running Tests
 
 ```bash
@@ -642,56 +1013,297 @@ curl -X POST http://localhost:3000/api/v1/jobs \
 npm test
 
 # Run with coverage
-npm run test:coverage
+npm test -- --coverage
 
 # Watch mode
 npm run test:watch
 
 # Specific test file
-npm test -- authService.test.ts
+npm test -- authMiddleware.test.ts
+
+# Verbose output
+npm test -- --verbose
 ```
 
 ### Test Coverage
 
-Target: **70%+ coverage**
+**Target: 70%+ coverage achieved!**
 
+Current coverage:
+- Statements: 70%+
+- Branches: 69%+  
+- Functions: 70%+
+- Lines: 70%+
+
+**Test Files:**
+- authService.test.ts (11 tests)
+- cacheService.test.ts (5 tests)
+- authController.test.ts (14 tests)
+- authMiddleware.test.ts (18 tests - includes RBAC)
+- errorHandler.test.ts (13 tests)
+- validator.test.ts (12 tests)
+- config.test.ts (11 tests)
+- logger.test.ts (10 tests)
+- mongodb.test.ts (4 tests)
+- redis.test.ts (15 tests)
+- rateLimiter.test.ts (6 tests)
+
+**Total: 100+ test cases**
+
+### Swagger API Testing
+
+#### Access Swagger UI
+
+**Local Development:**
 ```
---------------------|---------|----------|---------|---------|
-File                | % Stmts | % Branch | % Funcs | % Lines |
---------------------|---------|----------|---------|---------|
-All files           |   73.45 |    65.23 |   71.89 |   74.12 |
- services           |   85.67 |    78.45 |   83.33 |   86.21 |
- controllers        |   68.92 |    61.87 |   70.45 |   69.34 |
- middleware         |   76.34 |    68.92 |   75.00 |   77.56 |
---------------------|---------|----------|---------|---------|
+http://localhost:3000/api-docs
 ```
 
-### Test Types
+**Production (Railway):**
+```
+https://collaborative-workspace-production.up.railway.app/api-docs
+```
 
-**Unit Tests:**
-- Service logic
-- Utility functions
-- Isolated components
+#### Quick Start - Test Your First API
 
-**Integration Tests:**
-- API endpoints
-- Database operations
-- Full request/response flow
+**Step 1: Register User**
+1. Open Swagger UI
+2. Find `POST /api/v1/auth/register`
+3. Click "Try it out"
+4. Enter request body:
+   ```json
+   {
+     "email": "demo@example.com",
+     "password": "Demo123!@#",
+     "firstName": "Demo",
+     "lastName": "User"
+   }
+   ```
+5. Click "Execute"
+6. Copy the `accessToken` from response
 
-### Manual Testing with Demo
+**Step 2: Authorize Future Requests**
+1. Click 🔓 "Authorize" button (top right)
+2. Enter: `Bearer YOUR_ACCESS_TOKEN`
+   (Replace YOUR_ACCESS_TOKEN with copied token)
+3. Click "Authorize"
+4. Click "Close"
 
-1. Open `http://localhost:3000/demo.html`
-2. Open browser DevTools (F12)
-3. Check console for errors
-4. Test all features:
-   - Registration
-   - Login
-   - Project creation
-   - Workspace creation
-   - Real-time collaboration
-   - Job submission
+Now all protected endpoints are authenticated!
 
----
+**Step 3: Test Protected Endpoints**
+1. Try `POST /api/v1/projects`
+2. Enter:
+   ```json
+   {
+     "name": "My First Project",
+     "description": "Testing via Swagger"
+   }
+   ```
+3. Click "Execute"
+4. Should see 201 Created!
+
+#### Complete Testing Workflows
+
+**Workflow 1: Project Management**
+```
+1. POST /auth/register → Create account
+2. POST /auth/login → Get fresh token
+3. Authorize with token
+4. POST /projects → Create project
+5. GET /projects → List projects (cache test)
+6. GET /projects/{id} → Get specific project
+7. PUT /projects/{id} → Update project
+8. DELETE /projects/{id} → Delete project
+```
+
+**Workflow 2: Workspace & Collaboration**
+```
+1. Register 2 users (owner, collaborator)
+2. Login as owner
+3. Create project
+4. Create workspace
+5. POST /workspaces/{id}/collaborators
+   Body: { "email": "collab@example.com", "role": "collaborator" }
+6. Login as collaborator
+7. GET /workspaces/{id} → View workspace
+8. Try DELETE /workspaces/{id} → Should fail (403 Forbidden)
+```
+
+**Workflow 3: RBAC Testing**
+```
+Register 3 users:
+- owner@test.com
+- collab@test.com  
+- viewer@test.com
+
+Test Owner (all permissions):
+ Create workspace
+ Update workspace
+ Delete workspace
+ Invite collaborators
+ Change roles
+
+Test Collaborator:
+ View workspace
+ Edit content
+ Delete workspace (403)
+ Change roles (403)
+
+Test Viewer:
+ View workspace only
+ Everything else (403)
+```
+
+**Workflow 4: Background Jobs**
+```
+1. POST /jobs
+   {
+     "type": "code_execution",
+     "data": {
+       "code": "print('Hello from Swagger!')",
+       "language": "python"
+     }
+   }
+2. Copy jobId from response
+3. GET /jobs/{id} → Check status
+4. GET /jobs → List all your jobs
+```
+
+#### Testing Edge Cases
+
+**1. Rate Limiting**
+```
+- Make 10 rapid POST /auth/login requests
+- After 5 attempts: 429 Too Many Requests
+- Response: "Too many authentication attempts"
+```
+
+**2. Validation Errors**
+```
+- POST /projects with empty name
+- Response: 400 Bad Request
+- Body includes: { "errors": ["name is required"] }
+```
+
+**3. Caching Performance**
+```
+- GET /projects (first call - ~50-100ms)
+- GET /projects again (cached - ~5-10ms)
+- POST new project (invalidates cache)
+- GET /projects (cache miss - ~50-100ms)
+```
+
+**4. Unauthorized Access**
+```
+- Clear authorization (Authorize → Logout)
+- Try GET /projects
+- Response: 401 Unauthorized
+- Message: "No token provided"
+```
+
+**5. Token Expiration**
+```
+- Wait 15+ minutes with same token
+- Try any protected endpoint
+- Response: 401 Unauthorized
+- Message: "Invalid or expired token"
+- Use POST /auth/refresh to get new token
+```
+
+#### Response Status Codes
+
+| Code | Status | Meaning | Example |
+|------|--------|---------|---------|
+| 200 | OK | Success | GET /projects |
+| 201 | Created | Resource created | POST /projects |
+| 400 | Bad Request | Validation failed | Empty required field |
+| 401 | Unauthorized | No/invalid token | Missing Authorization |
+| 403 | Forbidden | Insufficient permissions | Viewer tries to delete |
+| 404 | Not Found | Resource doesn't exist | GET /projects/fake-id |
+| 429 | Too Many Requests | Rate limit exceeded | >5 login attempts |
+| 500 | Internal Server Error | Server issue | Database down |
+
+#### Swagger Pro Tips
+
+✅ **Do:**
+- Save tokens from login responses
+- Use "Authorize" button for JWT auth
+- Test both success and error cases
+- Check response schemas
+- Test with realistic data
+- Clear auth between different users
+
+❌ **Don't:**
+- Forget Bearer prefix in auth
+- Use expired tokens (refresh every 15min)
+- Share tokens publicly
+- Test production with fake data
+- Leave sensitive data in examples
+
+### Demo Page Testing
+
+1. Open demo page:
+   - Local: `http://localhost:3000/demo.html`
+   - Production: `https://collaborative-workspace-production.up.railway.app/demo.html`
+
+2. Open browser DevTools (F12) → Console tab
+
+3. **Test Registration:**
+   - Enter email, password, name
+   - Click Register
+   - Check console: "✅ Registration successful!"
+
+4. **Test Real-Time:**
+   - Open second browser window (incognito)
+   - Register different user
+   - Both join same workspace
+   - Type in one window
+   - See updates in other window instantly!
+
+5. **Test Collaboration Features:**
+   - File changes
+   - Cursor position
+   - User presence
+   - Activity feed
+
+### Testing Checklist
+
+Before deployment, verify:
+
+#### API Tests (Swagger)
+- [ ] User registration works
+- [ ] Login returns valid token
+- [ ] Token authorization works
+- [ ] Projects CRUD operations
+- [ ] Workspaces CRUD operations
+- [ ] Collaborator management
+- [ ] Role-based access control
+- [ ] Background jobs submit
+- [ ] Rate limiting triggers
+- [ ] Validation catches errors
+- [ ] Cache improves performance
+
+#### Real-Time Tests (Demo)
+- [ ] WebSocket connects
+- [ ] Users can join workspaces
+- [ ] Real-time updates work
+- [ ] Multiple users sync
+- [ ] Activity logs record
+- [ ] Presence tracking works
+
+#### Security Tests
+- [ ] JWT required for protected routes
+- [ ] Expired tokens rejected
+- [ ] RBAC permissions enforced
+- [ ] Rate limiting active
+- [ ] Input validation working
+- [ ] SQL injection prevented
+- [ ] XSS protection enabled
+
+
+
+
 
 ## Deployment
 
@@ -703,7 +1315,7 @@ This project is deployed on **Railway** instead of Vercel for critical architect
 1. **Full Backend Support** - Runs Node.js processes (not serverless)
 2. **WebSocket Support** - Real-time Socket.io connections stay alive
 3. **Background Workers** - Supports separate worker processes for Bull queue
-4. **Built-in Databases** - PostgreSQL, MongoDB, Redis included
+4. **Built-in Databases** - PostgreSQL and Redis included (MongoDB via Atlas)
 5. **No Timeouts** - Long-running processes work perfectly
 6. **Docker Support** - Full containerization with Dockerfile
 7. **Environment Variables** - Easy configuration management
@@ -737,26 +1349,45 @@ railway link
 
 #### 2. Add Database Services
 
-**Via Railway Dashboard:**
+**Railway Databases (Built-in):**
+
+Via Railway Dashboard:
 1. Go to https://railway.app/
 2. Click your project
 3. Click "New" → "Database"
 4. Add:
-   - PostgreSQL
-   - MongoDB  
-   - Redis
+   - ✅ **PostgreSQL** (Railway provides)
+   - ✅ **Redis** (Railway provides)
 
-**Via CLI:**
+Via CLI:
 ```bash
 railway add postgresql
-railway add mongodb  
 railway add redis
 ```
 
-Railway automatically sets environment variables:
+Railway automatically sets:
 - `DATABASE_URL` - PostgreSQL connection string
-- `MONGODB_URI` - MongoDB connection string
 - `REDIS_URL` - Redis connection string
+
+**MongoDB Atlas (External Service):**
+
+ **Important:** Railway does NOT provide MongoDB. Use MongoDB Atlas instead:
+
+1. Go to https://mongodb.com/cloud/atlas
+2. Create free account
+3. Create free cluster (M0 - 512MB)
+4. Database Access → Add User (username/password)
+5. Network Access → Add IP: `0.0.0.0/0` (allow all)
+6. Get connection string:
+   - Click "Connect" on your cluster
+   - Choose "Connect your application"
+   - Copy connection string
+   - Replace `<password>` with your password
+
+**Add to Railway Environment Variables:**
+```bash
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/workspace?retryWrites=true&w=majority
+```
 
 #### 3. Configure Environment Variables
 

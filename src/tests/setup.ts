@@ -12,13 +12,13 @@ afterAll(async () => {
   // Cleanup all connections
   try {
     // Close PostgreSQL
-    if (AppDataSource && AppDataSource.isInitialized) {
-      await AppDataSource.destroy();
-    }
+  if (AppDataSource && AppDataSource.isInitialized) {
+    await AppDataSource.destroy();
+  }
     
     // Close MongoDB
-    if (mongoose.connection.readyState !== 0) {
-      await mongoose.disconnect();
+  if (mongoose.connection.readyState !== 0) {
+    await mongoose.disconnect();
     }
     
     // Close Redis connections

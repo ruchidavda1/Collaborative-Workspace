@@ -9,14 +9,14 @@ const createRedisClient = () => {
   }
   
   return new Redis({
-    host: config.redis.host,
-    port: config.redis.port,
-    password: config.redis.password,
+  host: config.redis.host,
+  port: config.redis.port,
+  password: config.redis.password,
     retryStrategy: (times: number) => {
-      const delay = Math.min(times * 50, 2000);
-      return delay;
-    },
-  });
+    const delay = Math.min(times * 50, 2000);
+    return delay;
+  },
+});
 };
 
 export const redisClient = createRedisClient();
