@@ -6,39 +6,91 @@ A production-grade backend service for a real-time collaborative workspace platf
 
 <div align="center">
 
+<table>
+<tr>
+<td width="50%">
+
 ### Demo Page Interface
-<img src="./screenshots/demo-page.png" alt="Demo Page" width="300"/>
+<img src="./screenshots/demo-page.png" alt="Demo Page" width="100%"/>
+
+</td>
+<td width="50%">
 
 ### Login Success & WebSocket Connection
-<img src="./screenshots/loginsuccess-websocketconnect.png" alt="Login Success" width="300"/>
+<img src="./screenshots/loginsuccess-websocketconnect.png" alt="Login Success" width="100%"/>
+
+</td>
+</tr>
+
+<tr>
+<td width="50%">
 
 ### Real-Time Collaboration Logs
-<img src="./screenshots/RealTImeLogs.png" alt="Real-Time Logs" width="300"/>
+<img src="./screenshots/RealTImeLogs.png" alt="Real-Time Logs" width="100%"/>
+
+</td>
+<td width="50%">
 
 ### User Joined Workspace
-<img src="./screenshots/Joined Workspace.png" alt="User Joined" width="300"/>
+<img src="./screenshots/Joined Workspace.png" alt="User Joined" width="100%"/>
+
+</td>
+</tr>
+
+<tr>
+<td width="50%">
 
 ### Job Processing
-<img src="./screenshots/Job processing-DemoandAlice.png" alt="Job Processing" width="300"/>
+<img src="./screenshots/Job processing-DemoandAlice.png" alt="Job Processing" width="100%"/>
+
+</td>
+<td width="50%">
 
 ### Job Submitted
-<img src="./screenshots/Jobsubmitted-AliceandDemo.png" alt="Job Submitted" width="300"/>
+<img src="./screenshots/Jobsubmitted-AliceandDemo.png" alt="Job Submitted" width="100%"/>
+
+</td>
+</tr>
+
+<tr>
+<td colspan="2">
 
 ### Realtimechat-filechange
-<img src="./screenshots/realtimechat-filechange.png" alt="realtimechat-filechange" width="300"/>
+<img src="./screenshots/realtimechat-filechange.png" alt="realtimechat-filechange" width="50%"/>
+
+</td>
+</tr>
+</table>
 
 ---
 
 ### Swagger API Documentation
 
+<table>
+<tr>
+<td width="50%">
+
 ### Swagger UI - Complete Interface
-<img src="./screenshots/swaggerui1.png" alt="Swagger UI" width="300"/>
+<img src="./screenshots/swaggerui1.png" alt="Swagger UI" width="100%"/>
+
+</td>
+<td width="50%">
 
 ### Swagger - User Registration
-<img src="./screenshots/swagger-userregister.png" alt="User Registration" width="300"/>
+<img src="./screenshots/swagger-userregister.png" alt="User Registration" width="100%"/>
+
+</td>
+</tr>
+
+<tr>
+<td colspan="2">
 
 ### Swagger - Authorization
-<img src="./screenshots/swaggeruiauthorize.png" alt="Swagger Authorization" width="300"/>
+<img src="./screenshots/swaggeruiauthorize.png" alt="Swagger Authorization" width="50%"/>
+
+</td>
+</tr>
+</table>
 
 </div>
 
