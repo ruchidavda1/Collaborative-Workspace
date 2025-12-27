@@ -357,11 +357,6 @@ Once the server is running, access the interactive Swagger documentation at:
 http://localhost:3000/api-docs
 ```
 
-<div align="center">
-<img src="./screenshots/loginsuccess-websocketconnect.png" alt="Swagger Authentication Flow" width="300"/>
-<p><em>Interactive API testing with Swagger UI</em></p>
-</div>
-
 ### API Endpoints Overview
 
 #### Authentication
