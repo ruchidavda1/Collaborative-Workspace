@@ -2,21 +2,21 @@ import Redis from 'ioredis';
 import config from '../config';
 import logger from '../utils/logger';
 
-export const redisClient = new Redis({
-  host: config.redis.host,
-  port: config.redis.port,
-  password: config.redis.password,
-  retryStrategy: (times) => {
-    const delay = Math.min(times * 50, 2000);
-    return delay;
-  },
-});
+// Use REDIS_URL if available (Railway provides this), otherwise use individual config
+const redisOptions = process.env.REDIS_URL
+  ? process.env.REDIS_URL
+  : {
+      host: config.redis.host,
+      port: config.redis.port,
+      password: config.redis.password,
+      retryStrategy: (times: number) => {
+        const delay = Math.min(times * 50, 2000);
+        return delay;
+      },
+    };
 
-export const redisSubscriber = new Redis({
-  host: config.redis.host,
-  port: config.redis.port,
-  password: config.redis.password,
-});
+export const redisClient = new Redis(redisOptions);
+export const redisSubscriber = new Redis(redisOptions);
 
 redisClient.on('connect', () => {
   logger.info('Redis client connected');

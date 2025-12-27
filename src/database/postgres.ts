@@ -6,20 +6,34 @@ import { Workspace } from './entities/Workspace';
 import { WorkspaceCollaborator } from './entities/WorkspaceCollaborator';
 import logger from '../utils/logger';
 
-export const AppDataSource = new DataSource({
-  type: 'postgres',
-  host: config.postgres.host,
-  port: config.postgres.port,
-  username: config.postgres.username,
-  password: config.postgres.password,
-  database: config.postgres.database,
-  synchronize: config.node_env === 'development',
-  logging: config.node_env === 'development',
-  entities: [User, Project, Workspace, WorkspaceCollaborator],
-  migrations: ['src/database/migrations/*.ts'],
-  subscribers: [],
-  ssl: config.node_env === 'production' ? { rejectUnauthorized: false } : false,
-});
+// Use DATABASE_URL if available (Railway provides this), otherwise use individual config
+const databaseConfig = process.env.DATABASE_URL 
+  ? {
+      type: 'postgres' as const,
+      url: process.env.DATABASE_URL,
+      synchronize: config.node_env === 'development',
+      logging: config.node_env === 'development',
+      entities: [User, Project, Workspace, WorkspaceCollaborator],
+      migrations: ['src/database/migrations/*.ts'],
+      subscribers: [],
+      ssl: { rejectUnauthorized: false },
+    }
+  : {
+      type: 'postgres' as const,
+      host: config.postgres.host,
+      port: config.postgres.port,
+      username: config.postgres.username,
+      password: config.postgres.password,
+      database: config.postgres.database,
+      synchronize: config.node_env === 'development',
+      logging: config.node_env === 'development',
+      entities: [User, Project, Workspace, WorkspaceCollaborator],
+      migrations: ['src/database/migrations/*.ts'],
+      subscribers: [],
+      ssl: config.node_env === 'production' ? { rejectUnauthorized: false } : false,
+    };
+
+export const AppDataSource = new DataSource(databaseConfig);
 
 export const initializeDatabase = async () => {
   try {
